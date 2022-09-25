@@ -13,6 +13,12 @@ client.once('ready', () => {
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
+
+    const user = await interaction.guild?.members.fetch(interaction.user.id)
+    if (user?.nickname === 'Dorsan') {
+        return interaction.reply('אתה מכוער');
+    }
+
     const {commandName} = interaction;
     commands[commandName].execute(interaction, client);
 })
