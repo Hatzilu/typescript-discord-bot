@@ -1,1 +1,1 @@
-console.log('deez')
+import './bot'
