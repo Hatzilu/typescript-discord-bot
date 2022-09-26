@@ -15,7 +15,6 @@
         "semi": ["warn", "always"],
         "@typescript-eslint/semi": "off",
 		"arrow-spacing": ["warn", { "before": true, "after": true }],
-		"brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
         "no-trailing-spaces": ["error"],
         "@typescript-eslint/object-curly-spacing": "warn"
         

@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { config } from './config';
-import { addDoc, collection, getFirestore } from 'firebase/firestore/lite'
+import { addDoc, collection, getFirestore } from 'firebase/firestore/lite';
 
 const firebaseConfig = {
   apiKey: config.FIREBASE_API_KEY,
@@ -20,7 +20,7 @@ export async function createTicket (threadId: string, text: string): Promise<voi
       threadId,
       text,
       openedAt: Date()
-    })
+    });
   } catch (error) {
     console.error('Error adding document', error);
   }
