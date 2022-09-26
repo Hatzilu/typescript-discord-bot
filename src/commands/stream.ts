@@ -40,18 +40,18 @@ export async function execute (interaction: CommandInteraction, client: Client):
     await interaction.editReply('signalling');
   });
   connection.on(VoiceConnectionStatus.Ready, async state => {
-    console.log('ready');
+    console.log('VoiceConnectionStatus: Ready', { state });
     await interaction.editReply('ready');
     connection.subscribe(player);
     player.play(resource);
   });
   connection.on(VoiceConnectionStatus.Destroyed, async state => {
-    console.log('Destroyed');
-    await interaction.editReply('Destroyed');
+    console.log('VoiceConnectionStatus: Destroyed');
+    await interaction.editReply('Voice connection destroyed');
   });
   connection.on(VoiceConnectionStatus.Disconnected, async state => {
-    console.log('Disconnected');
-    await interaction.editReply('Disconnected');
+    console.log('VoiceConnectionStatus: Disconnected');
+    await interaction.editReply('Disconnected from voice channel!');
   });
 }
 
