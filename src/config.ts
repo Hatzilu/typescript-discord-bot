@@ -12,7 +12,7 @@ export const config: Record<string, string> = {
   DISCORD_TOKEN: DISCORD_TOKEN ?? ''
 };
 
-export const BOT_INTENTS: BitFieldResolvable<IntentsString, number> = ['GUILDS', 'GUILD_MESSAGES', 'DIRECT_MESSAGES'];
+export const BOT_INTENTS: BitFieldResolvable<IntentsString, number> = ['GUILDS', 'GUILD_MESSAGES', 'DIRECT_MESSAGES', 'GUILD_VOICE_STATES'];
 
 function throwErrIfEnvironmentVarsAreMissing (environmentVars: NodeJS.ProcessEnv): void {
   Object.values(environmentVars).forEach(v => {
