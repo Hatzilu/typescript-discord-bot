@@ -46,6 +46,40 @@
     node-fetch "^2.6.1"
     tslib "^2.3.0"
 
+"@discordjs/voice@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@discordjs/voice/-/voice-0.11.0.tgz#941f723a969b55cd37f07588d9683914d369be1b"
+  integrity sha512-6+9cj1dxzBJm7WJ9qyG2XZZQ8rcLl6x2caW0C0OxuTtMLAaEDntpb6lqMTFiBg/rDc4Rd59g1w0gJmib33CuHw==
+  dependencies:
+    "@types/ws" "^8.5.3"
+    discord-api-types "^0.36.2"
+    prism-media "^1.3.4"
+    tslib "^2.4.0"
+    ws "^8.8.1"
+
+"@distube/ytdl-core@^4.11.3":
+  version "4.11.5"
+  resolved "https://registry.yarnpkg.com/@distube/ytdl-core/-/ytdl-core-4.11.5.tgz#ba3dcfda21bdba31f4fd95b730393b45738ff7ed"
+  integrity "sha1-uj3P2iG9ujH0/ZW3MDk7RXOP9+0= sha512-zmsR2khWOzdnYm7FoDlaYDevcFM6Mt1Y+V/zDmCYsFUcQJw+9NZ+tKH4sKsNuI/lJrSoTGT5VMso+aftXCqj6A=="
+  dependencies:
+    m3u8stream "^0.8.6"
+    miniget "^4.2.2"
+    sax "^1.2.4"
+
+"@distube/ytpl@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@distube/ytpl/-/ytpl-1.1.1.tgz#f30b4d61066c80f0fd32cfc0d4150af4f3bb2629"
+  integrity "sha1-8wtNYQZsgPD9Ms/A1BUK9PO7Jik= sha512-/2I7GpdCv9SFdA4UprDGkq1y4ZkoAA1WYTZNmx/DjzZ0oVCLfxY9ZdYNQY5YwQqs4D4vNbXPvf6CliiWo5D3QA=="
+  dependencies:
+    miniget "^4.2.1"
+
+"@distube/ytsr@^1.1.8":
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/@distube/ytsr/-/ytsr-1.1.9.tgz#963ed3deaed4394e1e7190acdbe5382931ec1a21"
+  integrity "sha1-lj7T3q7UOU4ecZCs2+U4KTHsGiE= sha512-rFSQo9wQ51mfJcazik5xzQcQpnUEZhaDA9W/5F/4s6I+1FNEjLEwkS5fFhf5qgg2G69EYy0kzcnivKiPwRF+4A=="
+  dependencies:
+    miniget "^4.2.2"
+
 "@eslint/eslintrc@^1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-1.3.2.tgz#58b69582f3b7271d8fa67fe5251767a5b38ea356"
@@ -661,7 +695,7 @@
     "@types/mime" "*"
     "@types/node" "*"
 
-"@types/ws@^8.2.0":
+"@types/ws@^8.2.0", "@types/ws@^8.5.3":
   version "8.5.3"
   resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.3.tgz#7d25a1ffbecd3c4f2d35068d0b283c037003274d"
   integrity sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==
@@ -1187,6 +1221,11 @@ discord-api-types@^0.24.0:
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.24.0.tgz#9e429b8a1ddb4147134dfb3109093422de7ec549"
   integrity sha512-X0uA2a92cRjowUEXpLZIHWl4jiX1NsUpDhcEOpa1/hpO1vkaokgZ8kkPtPih9hHth5UVQ3mHBu/PpB4qjyfJ4A==
 
+discord-api-types@^0.36.2:
+  version "0.36.3"
+  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.36.3.tgz#a931b7e57473a5c971d6937fa5f392eb30047579"
+  integrity sha512-bz/NDyG0KBo/tY14vSkrwQ/n3HKPf87a0WFW/1M9+tXYK+vp5Z5EksawfCWo2zkAc6o7CClc0eff1Pjrqznlwg==
+
 discord.js@13.3.1:
   version "13.3.1"
   resolved "https://registry.yarnpkg.com/discord.js/-/discord.js-13.3.1.tgz#94fe05bc3ec0a3e4761e4f312a2a418c29721ab6"
@@ -1201,6 +1240,19 @@ discord.js@13.3.1:
     discord-api-types "^0.24.0"
     node-fetch "^2.6.1"
     ws "^8.2.3"
+
+distube@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/distube/-/distube-4.0.4.tgz#9c1288e975820ae2686fa0e140a8d9fe8cd0d331"
+  integrity "sha1-nBKI6XWCCuJob6DhQKjZ/ozQ0zE= sha512-Y/CePsz7pVeOXR6H40L+oHCERlMFO4eZYjrzQcGYrC0m+dTgp5OGseCUmwyWX1bjdSZdFHn4WMZ9yXvt1vJgjA=="
+  dependencies:
+    "@distube/ytdl-core" "^4.11.3"
+    "@distube/ytpl" "^1.1.1"
+    "@distube/ytsr" "^1.1.8"
+    prism-media "https://codeload.github.com/distubejs/prism-media/tar.gz/main#workaround.tar.gz"
+    tiny-typed-emitter "^2.1.0"
+    tslib "^2.4.0"
+    undici "^5.8.0"
 
 doctrine@^2.1.0:
   version "2.1.0"
@@ -2278,6 +2330,18 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
+libsodium-wrappers@^0.7.10:
+  version "0.7.10"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers/-/libsodium-wrappers-0.7.10.tgz#13ced44cacb0fc44d6ac9ce67d725956089ce733"
+  integrity sha512-pO3F1Q9NPLB/MWIhehim42b/Fwb30JNScCNh8TcQ/kIc+qGLQch8ag8wb0keK3EP5kbGakk1H8Wwo7v+36rNQg==
+  dependencies:
+    libsodium "^0.7.0"
+
+libsodium@^0.7.0:
+  version "0.7.10"
+  resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.7.10.tgz#c2429a7e4c0836f879d701fec2c8a208af024159"
+  integrity sha512-eY+z7hDrDKxkAK+QKZVNv92A5KYkxfvIshtBJkmg5TSiCnYqZP3i9OO9whE79Pwgm4jGaoHgkM4ao/b9Cyu4zQ==
+
 lie@~3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/lie/-/lie-3.3.0.tgz#dcf82dee545f46074daf200c7c1c5a08e0f40f6a"
@@ -2339,6 +2403,14 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
+m3u8stream@^0.8.6:
+  version "0.8.6"
+  resolved "https://registry.yarnpkg.com/m3u8stream/-/m3u8stream-0.8.6.tgz#0d6de4ce8ee69731734e6b616e7b05dd9d9a55b1"
+  integrity "sha1-DW3kzo7mlzFzTmthbnsF3Z2aVbE= sha512-LZj8kIVf9KCphiHmH7sbFQTVe4tOemb202fWwvJwR9W5ENW/1hxJN6ksAWGhQgSBSa3jyWhnjKU1Fw1GaOdbyA=="
+  dependencies:
+    miniget "^4.2.2"
+    sax "^1.2.4"
+
 make-dir@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-3.1.0.tgz#415e967046b3a7f1d185277d84aa58203726a13f"
@@ -2395,6 +2467,11 @@ mimic-response@^1.0.0, mimic-response@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/mimic-response/-/mimic-response-1.0.1.tgz#4923538878eef42063cb8a3e3b0798781487ab1b"
   integrity sha512-j5EctnkH7amfV/q5Hgmoal1g2QHFJRraOtmx0JpIqkxhBhI/lJSl1nMpQ45hVarwNETOoWEimndZ4QK0RHxuxQ==
+
+miniget@^4.2.1, miniget@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/miniget/-/miniget-4.2.2.tgz#db20320f265efdc4c1826a0be431d56753074475"
+  integrity "sha1-2yAyDyZe/cTBgmoL5DHVZ1MHRHU= sha512-a7voNL1N5lDMxvTMExOkg+Fq89jM2vY8pAi9ZEWzZtfNmdfP6RXkvUtFnCAXoCv2T9k1v/fUJVaAEuepGcvLYA=="
 
 minimatch@^3.0.4, minimatch@^3.1.1, minimatch@^3.1.2:
   version "3.1.2"
@@ -2655,6 +2732,15 @@ prettier@^2.7.1:
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.7.1.tgz#e235806850d057f97bb08368a4f7d899f7760c64"
   integrity sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==
 
+prism-media@^1.3.4:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/prism-media/-/prism-media-1.3.4.tgz#7951f26a9186b791dc8c820ff07310ec46a8a5f1"
+  integrity sha512-eW7LXORkTCQznZs+eqe9VjGOrLBxcBPXgNyHXMTSRVhphvd/RrxgIR7WaWt4fkLuhshcdT5KHL88LAfcvS3f5g==
+
+"prism-media@https://codeload.github.com/distubejs/prism-media/tar.gz/main#workaround.tar.gz":
+  version "1.3.3"
+  resolved "https://codeload.github.com/distubejs/prism-media/tar.gz/main#workaround.tar.gz"
+
 process-nextick-args@~2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
@@ -2894,6 +2980,11 @@ safe-regex-test@^1.0.0:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
+sax@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
+  integrity "sha1-KBYjTiN4vdxOU1T6tcqold9xANk= sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw=="
+
 selenium-webdriver@4.0.0-rc-1:
   version "4.0.0-rc-1"
   resolved "https://registry.yarnpkg.com/selenium-webdriver/-/selenium-webdriver-4.0.0-rc-1.tgz#b1e7e5821298c8a071e988518dd6b759f0c41281"
@@ -3104,6 +3195,11 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==
 
+tiny-typed-emitter@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/tiny-typed-emitter/-/tiny-typed-emitter-2.1.0.tgz#b3b027fdd389ff81a152c8e847ee2f5be9fad7b5"
+  integrity "sha1-s7An/dOJ/4GhUsjoR+4vW+n617U= sha512-qVtvMxeXbVej0cQWKqVSSAHmKZEHAvxdF8HEUBFWts8h+xEo5m/lEiPakuyZ3BnCBjOD8i24kzNOiOLLgsSxhA=="
+
 tmp@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.1.tgz#8457fc3037dcf4719c251367a1af6500ee1ccf14"
@@ -3165,7 +3261,7 @@ tslib@^1.8.1, tslib@^1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.1.0, tslib@^2.3.0, tslib@^2.3.1:
+tslib@^2.1.0, tslib@^2.3.0, tslib@^2.3.1, tslib@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
   integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
@@ -3228,6 +3324,11 @@ undefsafe@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-2.0.5.tgz#38733b9327bdcd226db889fb723a6efd162e6e2c"
   integrity sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==
+
+undici@^5.8.0:
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.10.0.tgz#dd9391087a90ccfbd007568db458674232ebf014"
+  integrity sha512-c8HsD3IbwmjjbLvoZuRI26TZic+TSEe8FPMLLOkN1AfYRhdjnKBU6yL+IwcSCbdZiX4e5t0lfMDLDCqj4Sq70g==
 
 unique-string@^2.0.0:
   version "2.0.0"
@@ -3381,7 +3482,7 @@ write-file-atomic@^3.0.0:
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
 
-ws@>=7.4.6, ws@>=8.7.0, ws@^8.2.3:
+ws@>=7.4.6, ws@>=8.7.0, ws@^8.2.3, ws@^8.8.1:
   version "8.9.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.9.0.tgz#2a994bb67144be1b53fe2d23c53c028adeb7f45e"
   integrity sha512-Ja7nszREasGaYUYCI2k4lCKIRTt+y7XuqVoHR44YpI49TtryyqbqvDMn5eqfW7e6HzTukDRIsXqzVHScqRcafg==
