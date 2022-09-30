@@ -3,6 +3,7 @@ import { AudioPlayerStatus, createAudioPlayer, DiscordGatewayAdapterCreator, get
 import { Client, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import ytdl from 'ytdl-core';
 import { ServerQueue } from '../classes/ServerQueue';
+import { Song } from '../types';
 import { getSongResourceByYouTubeUrl } from '../utils';
 
 const player = createAudioPlayer();
@@ -18,10 +19,13 @@ export async function execute (interaction: CommandInteraction, client: Client):
   await interaction.deferReply();
   const member = interaction.member as GuildMember;
   const voiceChannel = member.voice.channel as VoiceChannel;
-  // const textChannel = interaction.channel as TextChannel;
-  // const guild = interaction.guild as Guild;
   const url = interaction.options.getString('url');
+
   console.log(url);
+  if (url === 'debug') {
+    await interaction.editReply(`queue: ${serverQueue.getQueuedSongs().toString()}`);
+    return;
+  }
   if (url === null) {
     await interaction.editReply('please provide a valid url!');
     return;
@@ -30,22 +34,26 @@ export async function execute (interaction: CommandInteraction, client: Client):
     await interaction.editReply('Invalid YouTube url!');
     return;
   }
-  let connection = getVoiceConnection(voiceChannel.guild.id);
-  if (connection === undefined) {
-    connection = joinVoiceChannel({
-      channelId: voiceChannel.id,
-      guildId: voiceChannel.guild.id,
-      adapterCreator: voiceChannel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
-    });
-  }
+  const connection = getVoiceConnection(voiceChannel.guild.id) ?? joinVoiceChannel({
+    channelId: voiceChannel.id,
+    guildId: voiceChannel.guild.id,
+    adapterCreator: voiceChannel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
+  });
 
   connection.subscribe(player);
-  serverQueue.addUrlToQueue(url);
-  if (player.state.status === AudioPlayerStatus.Idle && (serverQueue.getQueuedUrls().length > 0)) {
+
+  const newSong: Song = {
+    url,
+    info: await ytdl.getInfo(url)
+  };
+  serverQueue.addSongToQueue(newSong);
+  interaction.editReply(`Added **${newSong.info.videoDetails.title}** to queue! position in queue: ${serverQueue.getQueuedSongs().length}`).catch(console.error);
+  const shouldAddSongToQueue: boolean = player.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
+  if (shouldAddSongToQueue) {
     const resource = getSongResourceByYouTubeUrl(url);
     player.play(resource);
   }
-  console.log('queued songs:', serverQueue.getQueuedUrls().length);
+  console.log('queued songs:', serverQueue.getQueuedSongs().length);
   connection.on(VoiceConnectionStatus.Signalling, () => {
     interaction.editReply('signalling').catch(console.error);
     console.log('signalling');
@@ -66,22 +74,18 @@ export async function execute (interaction: CommandInteraction, client: Client):
     connection?.destroy();
   });
 
-  player.on(AudioPlayerStatus.Buffering, () => {
-    interaction.editReply(`Buffering resource for ${url}`).catch(console.error);
-  });
   player.on(AudioPlayerStatus.Playing, () => {
-    interaction.editReply(`Now playing: ${url}`).catch(console.error);
+    interaction.editReply(`Now playing: **${newSong.info.videoDetails.title}** by **${newSong.info.videoDetails.author.name}**`).catch(console.error);
   });
 
   player.on(AudioPlayerStatus.Idle, () => {
     console.log('player is idle');
-    const nextUrl = serverQueue.getNextUrl();
+    const nextUrl = serverQueue.getNextSong();
     if (nextUrl === null) {
       return;
     }
-    const resource = getSongResourceByYouTubeUrl(nextUrl);
+    const resource = getSongResourceByYouTubeUrl(nextUrl.url);
     player.play(resource);
-    interaction.editReply('Playing new song!').catch(console.error);
   });
 
   player.on('error', console.error);

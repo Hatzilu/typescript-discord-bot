@@ -1,19 +1,20 @@
+import { Song } from '../types';
 
 export class ServerQueue {
-  songs: string[];
+  songs: Song[];
   constructor () {
     this.songs = [];
   }
 
-  getQueuedUrls (): string[] {
+  getQueuedSongs (): Song[] {
     return this.songs;
   }
 
-  addUrlToQueue (newSong: string): void {
+  addSongToQueue (newSong: Song): void {
     this.songs.push(newSong);
   }
 
-  getNextUrl (): string | null {
+  getNextSong (): Song | null {
     const nextUrl = this.songs.shift();
     if (nextUrl === undefined) {
       return null;
