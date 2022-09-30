@@ -1,18 +1,20 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { AudioPlayerStatus, createAudioPlayer, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
-import { Client, CommandInteraction, Guild, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
+import { Client, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import ytdl from 'ytdl-core';
 import { ServerQueue } from '../classes/ServerQueue';
 import { getSongResourceByYouTubeUrl } from '../utils';
 
 const player = createAudioPlayer();
+const serverQueue = new ServerQueue();
+
 export const data = new SlashCommandBuilder().setName('stream').setDescription('stream a song in VC').addStringOption(option =>
   option
     .setName('url')
     .setDescription('Provide a song URL')
     .setRequired(true));
 
-export async function execute (interaction: CommandInteraction, client: Client, serverQueue: ServerQueue): Promise<void> {
+export async function execute (interaction: CommandInteraction, client: Client): Promise<void> {
   await interaction.deferReply();
   const member = interaction.member as GuildMember;
   const voiceChannel = member.voice.channel as VoiceChannel;
@@ -28,7 +30,6 @@ export async function execute (interaction: CommandInteraction, client: Client, 
     await interaction.editReply('Invalid YouTube url!');
     return;
   }
-  const resource = await getSongResourceByYouTubeUrl(url);
   let connection = getVoiceConnection(voiceChannel.guild.id);
   if (connection === undefined) {
     connection = joinVoiceChannel({
@@ -39,12 +40,12 @@ export async function execute (interaction: CommandInteraction, client: Client, 
   }
 
   connection.subscribe(player);
-  if (serverQueue.getQueuedSongs().length > 0) {
-    serverQueue.addSongToQueue(resource);
-    interaction.editReply(`added to queue! current songs in queue: ${serverQueue.getQueuedSongs().length}`).catch(console.error);
-    return;
+  serverQueue.addUrlToQueue(url);
+  if (player.state.status === AudioPlayerStatus.Idle && (serverQueue.getQueuedUrls().length > 0)) {
+    const resource = getSongResourceByYouTubeUrl(url);
+    player.play(resource);
   }
-  console.log('queued songs: ', serverQueue.getQueuedSongs().length);
+  console.log('queued songs:', serverQueue.getQueuedUrls().length);
   connection.on(VoiceConnectionStatus.Signalling, () => {
     interaction.editReply('signalling').catch(console.error);
     console.log('signalling');
@@ -52,36 +53,36 @@ export async function execute (interaction: CommandInteraction, client: Client, 
 
   connection.on(VoiceConnectionStatus.Ready, () => {
     console.log('VoiceConnectionStatus: Ready');
-    interaction.editReply(`playing ${url}`).catch(console.error);
-    serverQueue.addSongToQueue(resource);
-    const nextSong = serverQueue.getNextSong();
-    if (nextSong !== null) {
-      player.play(nextSong);
-    }
   });
+
   connection.on(VoiceConnectionStatus.Destroyed, () => {
     console.log('VoiceConnectionStatus: Destroyed');
     interaction.editReply('Voice connection destroyed').catch(console.error);
   });
+
   connection.on(VoiceConnectionStatus.Disconnected, () => {
     console.log('VoiceConnectionStatus: Disconnected');
     interaction.editReply('Disconnected from voice channel!').catch(console.error);
+    connection?.destroy();
+  });
+
+  player.on(AudioPlayerStatus.Buffering, () => {
+    interaction.editReply(`Buffering resource for ${url}`).catch(console.error);
+  });
+  player.on(AudioPlayerStatus.Playing, () => {
+    interaction.editReply(`Now playing: ${url}`).catch(console.error);
   });
 
   player.on(AudioPlayerStatus.Idle, () => {
     console.log('player is idle');
-    const nextSong = serverQueue.getNextSong();
-    if (nextSong === null) {
-      interaction.editReply('There are no more songs to play!').catch(console.error);
+    const nextUrl = serverQueue.getNextUrl();
+    if (nextUrl === null) {
       return;
     }
-    player.play(nextSong);
+    const resource = getSongResourceByYouTubeUrl(nextUrl);
+    player.play(resource);
     interaction.editReply('Playing new song!').catch(console.error);
   });
 
   player.on('error', console.error);
-}
-
-async function playSong (member: GuildMember, voiceChannel: VoiceChannel, textChannel: TextChannel, guild: Guild, args: string[]): Promise<void> {
-  // TODO
 }
