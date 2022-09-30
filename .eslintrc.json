@@ -16,7 +16,8 @@
         "@typescript-eslint/semi": "off",
 		"arrow-spacing": ["warn", { "before": true, "after": true }],
         "no-trailing-spaces": ["error"],
-        "@typescript-eslint/object-curly-spacing": "warn"
+        "@typescript-eslint/object-curly-spacing": "warn",        
+        "eol-last": "warn"
         
     }
 }
