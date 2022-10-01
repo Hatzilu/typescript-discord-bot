@@ -1,13 +1,10 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { AudioPlayerStatus, createAudioPlayer, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, PlayerSubscription, VoiceConnectionStatus } from '@discordjs/voice';
+import { AudioPlayerStatus, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { Client, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import ytdl from 'ytdl-core';
-import { ServerQueue } from '../classes/ServerQueue';
-import { Song } from '../types';
-import { getSongResourceByYouTubeUrl } from '../utils';
-
-const player = createAudioPlayer();
-const serverQueue = new ServerQueue();
+import { Song } from '../../types';
+import { getSongResourceByYouTubeUrl } from '../../utils';
+import { serverQueue, player } from './music-utils';
 
 export const data = new SlashCommandBuilder().setName('stream').setDescription('stream a song in VC').addStringOption(option =>
   option
