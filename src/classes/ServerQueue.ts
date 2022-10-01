@@ -15,11 +15,11 @@ export class ServerQueue {
   }
 
   getNextSong (): Song | null {
-    const nextUrl = this.songs.shift();
-    if (nextUrl === undefined) {
+    const nextSong = this.songs.shift();
+    if (nextSong === undefined) {
       return null;
     }
-    return nextUrl;
+    return nextSong;
   }
 
   clear (): void {

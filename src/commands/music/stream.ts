@@ -82,11 +82,12 @@ export async function execute (interaction: CommandInteraction, client: Client):
 
   player.on(AudioPlayerStatus.Idle, () => {
     console.log('player is idle');
-    const nextUrl = serverQueue.getNextSong();
-    if (nextUrl === null) {
+    const nextSong = serverQueue.getNextSong();
+    if (nextSong === null) {
+      console.log('no more songs to play, returning...');
       return;
     }
-    const resource = getSongResourceByYouTubeUrl(nextUrl.url);
+    const resource = getSongResourceByYouTubeUrl(nextSong.url);
     player.play(resource);
   });
 
