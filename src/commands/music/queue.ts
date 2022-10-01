@@ -10,7 +10,7 @@ export function execute (interaction: CommandInteraction): void {
     return;
   }
   const songListString: string[] =
-    serverQueue.getQueuedSongs().map((song, index) => `[${index + 1}]: ${song.info.videoDetails.title} - Requested by [${interaction.user.username}]`);
+    serverQueue.getQueuedSongs().map((song, index) => `[${index + 1}]: ${song.info.videoDetails.title}`);
 
   const codeBlockFormattedString: string = '```ini\n' + `${songListString.join('\r\n')}` + '```';
   interaction.reply(codeBlockFormattedString).catch(console.error);
