@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { AudioPlayerStatus, createAudioPlayer, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
+import { AudioPlayerStatus, createAudioPlayer, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, PlayerSubscription, VoiceConnectionStatus } from '@discordjs/voice';
 import { Client, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import ytdl from 'ytdl-core';
 import { ServerQueue } from '../classes/ServerQueue';
@@ -22,12 +22,8 @@ export async function execute (interaction: CommandInteraction, client: Client):
   const url = interaction.options.getString('url');
 
   console.log(url);
-  if (url === 'debug') {
-    await interaction.editReply(`queue: ${serverQueue.getQueuedSongs().toString()}`);
-    return;
-  }
   if (url === null) {
-    await interaction.editReply('please provide a valid url!');
+    await interaction.editReply('please provide a url!');
     return;
   }
   if (!ytdl.validateURL(url)) {
@@ -40,7 +36,12 @@ export async function execute (interaction: CommandInteraction, client: Client):
     adapterCreator: voiceChannel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
   });
 
-  connection.subscribe(player);
+  const audioPlayerSubscription = connection.subscribe(player);
+
+  if (audioPlayerSubscription === undefined) {
+    await interaction.editReply('Unable to subscribe to AudioPlayer, please open a support ticket.');
+    return;
+  }
 
   const newSong: Song = {
     url,
@@ -71,7 +72,11 @@ export async function execute (interaction: CommandInteraction, client: Client):
   connection.on(VoiceConnectionStatus.Disconnected, () => {
     console.log('VoiceConnectionStatus: Disconnected');
     interaction.editReply('Disconnected from voice channel!').catch(console.error);
-    connection?.destroy();
+    if (connection.state.status !== VoiceConnectionStatus.Destroyed) {
+      connection.destroy();
+    }
+    serverQueue.clear();
+    audioPlayerSubscription.unsubscribe();
   });
 
   player.on(AudioPlayerStatus.Playing, () => {

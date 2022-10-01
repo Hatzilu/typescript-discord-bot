@@ -21,4 +21,8 @@ export class ServerQueue {
     }
     return nextUrl;
   }
+
+  clear (): void {
+    this.songs = [];
+  }
 }
