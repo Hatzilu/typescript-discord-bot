@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Client, CommandInteraction, MessageEmbed } from 'discord.js';
+import { Client, CommandInteraction, HexColorString, MessageEmbed } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
   .setName('rice')
@@ -35,17 +35,17 @@ function getRandomPost (json: RedditResponse): RedditPost {
 
 function getRedditPostEmbed (randomPost: RedditPost): MessageEmbed {
   return new MessageEmbed()
-    .setColor(0x0099FF)
+    .setColor(randomPost.data.link_flair_background_color as HexColorString ?? 0x0099FF)
     .setTitle(randomPost.data.title)
     .setURL('https://www.reddit.com' + randomPost.data.permalink)
     .addField(
-      'upvotes', randomPost.data.ups.toString(), true
+      'Upvotes', randomPost.data.ups.toString(), true
     )
     .addField(
-      'downvotes', randomPost.data.downs.toString(), true
+      'Submitted by', randomPost.data.author
     )
     .setImage(randomPost.data.url)
-    .setTimestamp();
+    .setTimestamp(randomPost.data.created * 1000);
 }
 interface RedditResponse {
 
@@ -70,5 +70,7 @@ interface RedditPost {
     url: string
     permalink: string
     is_video: boolean
+    link_flair_background_color: string
+    created: number
   }
 }
