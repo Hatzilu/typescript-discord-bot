@@ -1,10 +1,10 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { AudioPlayerStatus, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
+import { AudioPlayerStatus } from '@discordjs/voice';
 import { Client, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import ytdl from 'ytdl-core';
 import { Song } from '../../types';
 import { getSongResourceByYouTubeUrl } from '../../utils';
-import { serverQueue, player } from './music-utils';
+import { serverQueue, player, connectToChannel } from './music-utils';
 
 export const data = new SlashCommandBuilder().setName('stream').setDescription('stream a song in VC').addStringOption(option =>
   option
@@ -27,11 +27,7 @@ export async function execute (interaction: CommandInteraction, client: Client):
     await interaction.editReply('Invalid YouTube url!');
     return;
   }
-  const connection = getVoiceConnection(voiceChannel.guild.id) ?? joinVoiceChannel({
-    channelId: voiceChannel.id,
-    guildId: voiceChannel.guild.id,
-    adapterCreator: voiceChannel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
-  });
+  const connection = await connectToChannel(voiceChannel);
 
   const audioPlayerSubscription = connection.subscribe(player);
 
@@ -52,30 +48,6 @@ export async function execute (interaction: CommandInteraction, client: Client):
     player.play(resource);
   }
   console.log('queued songs:', serverQueue.getQueuedSongs().length);
-  connection.on(VoiceConnectionStatus.Signalling, () => {
-    interaction.editReply('signalling').catch(console.error);
-    console.log('signalling');
-  });
-
-  connection.on(VoiceConnectionStatus.Ready, () => {
-    console.log('VoiceConnectionStatus: Ready');
-  });
-
-  connection.on(VoiceConnectionStatus.Destroyed, () => {
-    console.log('VoiceConnectionStatus: Destroyed');
-    interaction.editReply('Voice connection destroyed').catch(console.error);
-  });
-
-  connection.on(VoiceConnectionStatus.Disconnected, () => {
-    console.log('VoiceConnectionStatus: Disconnected');
-    interaction.editReply('Disconnected from voice channel!').catch(console.error);
-    if (connection.state.status !== VoiceConnectionStatus.Destroyed) {
-      connection.destroy();
-    }
-    serverQueue.clear();
-    audioPlayerSubscription.unsubscribe();
-  });
-
   player.on(AudioPlayerStatus.Playing, () => {
     interaction.editReply(`Now playing: **${newSong.info.videoDetails.title}** by **${newSong.info.videoDetails.author.name}**`).catch(console.error);
   });
