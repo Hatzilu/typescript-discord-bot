@@ -14,10 +14,10 @@ export class ServerQueue {
     this.songs.push(newSong);
   }
 
-  getNextSong (): Song | null {
+  getNextSong (): Song | undefined {
     const nextSong = this.songs.shift();
     if (nextSong === undefined) {
-      return null;
+      return undefined;
     }
     return nextSong;
   }

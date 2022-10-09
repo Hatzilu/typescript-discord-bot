@@ -6,23 +6,20 @@ import { getSongResourceByYouTubeUrl } from '../../utils';
 export const serverQueue = new ServerQueue();
 export const player = createAudioPlayer();
 
-player.on(AudioPlayerStatus.Playing, () => {
-  const currentSong = serverQueue.songs[0];
-  console.log(`Now playing: **${currentSong.info.videoDetails.title}** by **${currentSong.info.videoDetails.author.name}**`);
-});
-
 player.on(AudioPlayerStatus.Idle, () => {
-  console.log('player is idle');
   const nextSong = serverQueue.getNextSong();
-  if (nextSong === null) {
+  console.log('player is idle');
+  if (nextSong === undefined) {
     console.log('no more songs to play, returning...');
     return;
   }
+  console.log('nextSong:', nextSong.url);
   const resource = getSongResourceByYouTubeUrl(nextSong.url);
   player.play(resource);
 });
 
 player.on('error', console.error);
+
 export async function connectToChannel (channel: VoiceChannel): Promise<VoiceConnection> {
   const connection = getVoiceConnection(channel.guild.id) ?? joinVoiceChannel({
     channelId: channel.id,
@@ -60,7 +57,9 @@ export async function connectToChannel (channel: VoiceChannel): Promise<VoiceCon
         setTimeout(connection.rejoin, (connection.rejoinAttempts + 1) * 5_000);
       } else {
         // The disconnect is recoverable, but we have no more attempts
-        connection.destroy();
+        if (connection.state.status !== VoiceConnectionStatus.Destroyed) {
+          connection.destroy();
+        }
       }
     });
     return connection;

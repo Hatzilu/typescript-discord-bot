@@ -42,11 +42,24 @@ export async function execute (interaction: CommandInteraction, client: Client):
     requestingUser: interaction.user
   };
   serverQueue.addSongToQueue(newSong);
-  interaction.editReply(`Added **${newSong.info.videoDetails.title}** to queue! position in queue: ${serverQueue.getQueuedSongs().length}`).catch(console.error);
+  interaction.editReply(`Added **${newSong.info.videoDetails.title as string}** to queue! position in queue: ${serverQueue.getQueuedSongs().length}`).catch(console.error);
   const shouldPlaySongImmediately: boolean = player.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
   if (shouldPlaySongImmediately) {
-    const resource = getSongResourceByYouTubeUrl(url);
+    const nextSong = serverQueue.getNextSong();
+    if (nextSong === undefined) {
+      console.log('nextSong is undefined');
+      return;
+    }
+    const resource = getSongResourceByYouTubeUrl(nextSong.url);
     player.play(resource);
   }
+  player.on(AudioPlayerStatus.Playing, state => {
+    console.log({ state });
+    // if currently playing song is not newSong, don't write this to the user!!
+    const _name: string = newSong.info.videoDetails.title;
+    const _author: string = newSong.info.videoDetails.author.name;
+    interaction.editReply(`Now playing: **${_name}** by **${_author}**`).catch(console.error);
+  });
+
   console.log('queued songs:', serverQueue.getQueuedSongs().length);
 }
