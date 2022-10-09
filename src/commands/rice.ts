@@ -1,26 +1,28 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Client, CommandInteraction, HexColorString, MessageEmbed } from 'discord.js';
-import fetch from 'node-fetch';
+import fetch, { Response } from 'node-fetch';
 
 export const data = new SlashCommandBuilder()
   .setName('rice')
   .setDescription('Random riced linux desktop from the r/unixporn subreddit');
 
+const postCache: RedditPost[] = [];
+
 export async function execute (interaction: CommandInteraction, client: Client): Promise<void> {
   await interaction.deferReply();
-  const response: any = await fetch('https://www.reddit.com/r/unixporn/top.json?sort=top&t=all&limit=100&q=cat&nsfw=1&include_over_18=on');
-  const json = (await response.json() as RedditResponse);
-  if (json.data.children.length === 0) {
+
+  const posts = await getPostsFromAPIorCache();
+
+  if (posts.length === 0) {
     interaction.editReply('sorry, something went wrong...').catch(console.error);
     return;
   }
-  let randomPost: RedditPost = getRandomPost(json);
+  let randomPost: RedditPost = getRandomPost(posts);
   while (randomPost.data.is_video ?? !randomPost.data.url.endsWith('png') ?? !randomPost.data.url.endsWith('jpg')) {
-    randomPost = getRandomPost(json);
+    randomPost = getRandomPost(posts);
   }
   try {
     const redditPostEmbed = getRedditPostEmbed(randomPost);
-    console.log(randomPost);
     interaction.editReply({ embeds: [redditPostEmbed] }).catch(console.error);
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -30,8 +32,11 @@ export async function execute (interaction: CommandInteraction, client: Client):
   }
 }
 
-function getRandomPost (json: RedditResponse): RedditPost {
-  return json?.data?.children[Math.ceil(Math.random() * json?.data?.children?.length)];
+function getRandomPost (posts: RedditPost[]): RedditPost {
+  const index = Math.ceil(Math.random() * posts.length);
+  const post = posts[index];
+  posts.splice(index, 1); // remove the item from cache
+  return post;
 }
 
 function getRedditPostEmbed (randomPost: RedditPost): MessageEmbed {
@@ -47,6 +52,17 @@ function getRedditPostEmbed (randomPost: RedditPost): MessageEmbed {
     )
     .setImage(randomPost.data.url)
     .setTimestamp(randomPost.data.created * 1000);
+}
+
+async function getPostsFromAPIorCache (): Promise<RedditPost[]> {
+  if (postCache.length > 0) {
+    return postCache;
+  }
+  const response: Response = await fetch('https://www.reddit.com/r/unixporn/top.json?sort=top&t=all&limit=100&q=cat&nsfw=1&include_over_18=on');
+  const json = (await response.json() as RedditResponse);
+  postCache.push(...json.data.children);
+
+  return json.data.children;
 }
 interface RedditResponse {
 
