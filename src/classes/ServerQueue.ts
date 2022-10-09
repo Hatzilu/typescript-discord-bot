@@ -1,7 +1,9 @@
+import { TextChannel } from 'discord.js';
 import { Song } from '../types';
 
 export class ServerQueue {
-  songs: Song[];
+  private songs: Song[];
+  private textChannel: TextChannel | undefined;
   constructor () {
     this.songs = [];
   }
@@ -20,6 +22,18 @@ export class ServerQueue {
       return undefined;
     }
     return nextSong;
+  }
+
+  getFirstSong (): Song | undefined {
+    return this.songs[0];
+  }
+
+  getTextChannel (): TextChannel | undefined {
+    return this.textChannel;
+  }
+
+  setTextChannel (newChannel: TextChannel): void {
+    this.textChannel = newChannel;
   }
 
   clear (): void {

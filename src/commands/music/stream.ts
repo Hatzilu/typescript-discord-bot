@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { AudioPlayerStatus } from '@discordjs/voice';
-import { Client, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
+import { Client, CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 import ytdl from 'ytdl-core';
 import { Song } from '../../types';
 import { getSongResourceByYouTubeUrl } from '../../utils';
@@ -16,6 +16,9 @@ export async function execute (interaction: CommandInteraction, client: Client):
   await interaction.deferReply();
   const member = interaction.member as GuildMember;
   const voiceChannel = member.voice.channel as VoiceChannel;
+  if (serverQueue.getTextChannel() === undefined) {
+    serverQueue.setTextChannel(interaction.channel as TextChannel);
+  }
   const url = interaction.options.getString('url');
 
   console.log(url);
@@ -42,10 +45,10 @@ export async function execute (interaction: CommandInteraction, client: Client):
     requestingUser: interaction.user
   };
   serverQueue.addSongToQueue(newSong);
-  interaction.editReply(`Added **${newSong.info.videoDetails.title as string}** to queue! position in queue: ${serverQueue.getQueuedSongs().length}`).catch(console.error);
+  interaction.editReply(`Added **${newSong.info.videoDetails.title}** to queue! position in queue: ${serverQueue.getQueuedSongs().length}`).catch(console.error);
   const shouldPlaySongImmediately: boolean = player.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
   if (shouldPlaySongImmediately) {
-    const nextSong = serverQueue.getNextSong();
+    const nextSong = serverQueue.getFirstSong();
     if (nextSong === undefined) {
       console.log('nextSong is undefined');
       return;
@@ -53,13 +56,6 @@ export async function execute (interaction: CommandInteraction, client: Client):
     const resource = getSongResourceByYouTubeUrl(nextSong.url);
     player.play(resource);
   }
-  player.on(AudioPlayerStatus.Playing, state => {
-    console.log({ state });
-    // if currently playing song is not newSong, don't write this to the user!!
-    const _name: string = newSong.info.videoDetails.title;
-    const _author: string = newSong.info.videoDetails.author.name;
-    interaction.editReply(`Now playing: **${_name}** by **${_author}**`).catch(console.error);
-  });
 
   console.log('queued songs:', serverQueue.getQueuedSongs().length);
 }

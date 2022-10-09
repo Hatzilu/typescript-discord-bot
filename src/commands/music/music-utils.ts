@@ -6,8 +6,16 @@ import { getSongResourceByYouTubeUrl } from '../../utils';
 export const serverQueue = new ServerQueue();
 export const player = createAudioPlayer();
 
+player.on(AudioPlayerStatus.Playing, () => {
+  const currentlyPlayingSong = serverQueue.getNextSong();
+  if (currentlyPlayingSong === undefined) return;
+
+  const channel = serverQueue.getTextChannel();
+  if (channel === undefined) return;
+  channel.send(`Now Playing: **${currentlyPlayingSong.info.videoDetails.title}**`).catch(console.error);
+});
 player.on(AudioPlayerStatus.Idle, () => {
-  const nextSong = serverQueue.getNextSong();
+  const nextSong = serverQueue.getFirstSong();
   console.log('player is idle');
   if (nextSong === undefined) {
     console.log('no more songs to play, returning...');
