@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Client, CommandInteraction, HexColorString, MessageEmbed } from 'discord.js';
+import fetch from 'node-fetch';
 
 export const data = new SlashCommandBuilder()
   .setName('rice')
@@ -7,7 +8,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute (interaction: CommandInteraction, client: Client): Promise<void> {
   await interaction.deferReply();
-  const response: Response = await fetch('https://www.reddit.com/r/unixporn/top.json?sort=top&t=all&limit=100&q=cat&nsfw=1&include_over_18=on');
+  const response: any = await fetch('https://www.reddit.com/r/unixporn/top.json?sort=top&t=all&limit=100&q=cat&nsfw=1&include_over_18=on');
   const json = (await response.json() as RedditResponse);
   if (json.data.children.length === 0) {
     interaction.editReply('sorry, something went wrong...').catch(console.error);
