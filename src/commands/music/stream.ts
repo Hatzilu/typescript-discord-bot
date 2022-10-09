@@ -8,7 +8,7 @@ import { serverQueue, player, connectToChannel } from './music-utils';
 
 export const data = new SlashCommandBuilder().setName('stream').setDescription('stream a song in VC').addStringOption(option =>
   option
-    .setName('url')
+    .setName('query')
     .setDescription('Provide a song URL')
     .setRequired(true));
 
@@ -19,7 +19,7 @@ export async function execute (interaction: CommandInteraction, client: Client):
   if (serverQueue.getTextChannel() === undefined) {
     serverQueue.setTextChannel(interaction.channel as TextChannel);
   }
-  const url = interaction.options.getString('url');
+  const url = interaction.options.getString('query');
 
   console.log(url);
   if (url === null) {
