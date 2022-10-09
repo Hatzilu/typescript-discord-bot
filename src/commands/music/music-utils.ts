@@ -1,9 +1,28 @@
-import { createAudioPlayer, DiscordGatewayAdapterCreator, entersState, getVoiceConnection, joinVoiceChannel, VoiceConnection, VoiceConnectionDisconnectReason, VoiceConnectionStatus } from '@discordjs/voice';
+import { AudioPlayerStatus, createAudioPlayer, DiscordGatewayAdapterCreator, entersState, getVoiceConnection, joinVoiceChannel, VoiceConnection, VoiceConnectionDisconnectReason, VoiceConnectionStatus } from '@discordjs/voice';
 import { VoiceChannel } from 'discord.js';
 import { ServerQueue } from '../../classes/ServerQueue';
+import { getSongResourceByYouTubeUrl } from '../../utils';
 
 export const serverQueue = new ServerQueue();
 export const player = createAudioPlayer();
+
+player.on(AudioPlayerStatus.Playing, () => {
+  const currentSong = serverQueue.songs[0];
+  console.log(`Now playing: **${currentSong.info.videoDetails.title}** by **${currentSong.info.videoDetails.author.name}**`);
+});
+
+player.on(AudioPlayerStatus.Idle, () => {
+  console.log('player is idle');
+  const nextSong = serverQueue.getNextSong();
+  if (nextSong === null) {
+    console.log('no more songs to play, returning...');
+    return;
+  }
+  const resource = getSongResourceByYouTubeUrl(nextSong.url);
+  player.play(resource);
+});
+
+player.on('error', console.error);
 export async function connectToChannel (channel: VoiceChannel): Promise<VoiceConnection> {
   const connection = getVoiceConnection(channel.guild.id) ?? joinVoiceChannel({
     channelId: channel.id,

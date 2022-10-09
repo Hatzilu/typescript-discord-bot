@@ -38,30 +38,15 @@ export async function execute (interaction: CommandInteraction, client: Client):
 
   const newSong: Song = {
     url,
-    info: await ytdl.getInfo(url)
+    info: await ytdl.getInfo(url),
+    requestingUser: interaction.user
   };
   serverQueue.addSongToQueue(newSong);
   interaction.editReply(`Added **${newSong.info.videoDetails.title}** to queue! position in queue: ${serverQueue.getQueuedSongs().length}`).catch(console.error);
-  const shouldAddSongToQueue: boolean = player.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
-  if (shouldAddSongToQueue) {
+  const shouldPlaySongImmediately: boolean = player.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
+  if (shouldPlaySongImmediately) {
     const resource = getSongResourceByYouTubeUrl(url);
     player.play(resource);
   }
   console.log('queued songs:', serverQueue.getQueuedSongs().length);
-  player.on(AudioPlayerStatus.Playing, () => {
-    interaction.editReply(`Now playing: **${newSong.info.videoDetails.title}** by **${newSong.info.videoDetails.author.name}**`).catch(console.error);
-  });
-
-  player.on(AudioPlayerStatus.Idle, () => {
-    console.log('player is idle');
-    const nextSong = serverQueue.getNextSong();
-    if (nextSong === null) {
-      console.log('no more songs to play, returning...');
-      return;
-    }
-    const resource = getSongResourceByYouTubeUrl(nextSong.url);
-    player.play(resource);
-  });
-
-  player.on('error', console.error);
 }

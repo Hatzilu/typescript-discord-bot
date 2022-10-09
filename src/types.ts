@@ -1,3 +1,4 @@
+import { User } from 'discord.js';
 import { videoInfo } from 'ytdl-core';
 
 export interface Command {
@@ -8,4 +9,5 @@ export interface Command {
 export interface Song {
   url: string
   info: videoInfo
+  requestingUser: User
 }
