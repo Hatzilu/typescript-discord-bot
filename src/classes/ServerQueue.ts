@@ -4,6 +4,7 @@ import { Song } from '../types';
 export class ServerQueue {
   private songs: Song[];
   private textChannel: TextChannel | undefined;
+
   constructor () {
     this.songs = [];
   }
@@ -17,11 +18,7 @@ export class ServerQueue {
   }
 
   getNextSong (): Song | undefined {
-    const nextSong = this.songs.shift();
-    if (nextSong === undefined) {
-      return undefined;
-    }
-    return nextSong;
+    return this.songs.shift();
   }
 
   getFirstSong (): Song | undefined {
