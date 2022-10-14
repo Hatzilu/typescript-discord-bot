@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  disbot:
+    image: disbot
+    build: ./
+    ports:
+      - "8001:8000"
