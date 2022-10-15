@@ -9,6 +9,7 @@ export const player = createAudioPlayer();
 player.on(AudioPlayerStatus.Playing, () => {
   const currentlyPlayingSong = serverQueue.getNextSong();
   if (currentlyPlayingSong === undefined) return;
+  console.log(`[Audio-Player] now playing: ${currentlyPlayingSong.url} by ${currentlyPlayingSong.requestingUser.username}`);
 
   const channel = serverQueue.getTextChannel();
   if (channel === undefined) return;
@@ -16,17 +17,17 @@ player.on(AudioPlayerStatus.Playing, () => {
 });
 player.on(AudioPlayerStatus.Idle, () => {
   const nextSong = serverQueue.getFirstSong();
-  console.log('player is idle');
+  console.log('[Audio-Player] player is idle');
   if (nextSong === undefined) {
-    console.log('no more songs to play, returning...');
+    console.log('[Audio-Player] no more songs to play, returning from on.idle event...');
     return;
   }
-  console.log('nextSong:', nextSong.url);
+  console.log('[Audio-Player] next song: ', nextSong.url);
   const resource = getSongResourceByYouTubeUrl(nextSong.url);
   player.play(resource);
 });
 
-player.on('error', console.error);
+player.on('error', err => console.error('[Audio-Player] ', err));
 
 export async function connectToChannel (channel: VoiceChannel): Promise<VoiceConnection> {
   const connection = getVoiceConnection(channel.guild.id) ?? joinVoiceChannel({
@@ -37,6 +38,7 @@ export async function connectToChannel (channel: VoiceChannel): Promise<VoiceCon
   try {
     await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
     connection.on('stateChange', (_, newState) => {
+      console.log(`[Voice connection] state changed to ${newState.status}`);
       if (newState.status !== VoiceConnectionStatus.Disconnected) {
         return;
       }
@@ -44,6 +46,7 @@ export async function connectToChannel (channel: VoiceChannel): Promise<VoiceCon
         newState.reason === VoiceConnectionDisconnectReason.WebSocketClose &&
         newState.closeCode === 4014
       ) {
+        console.log('[Voice connection] websocket close with a 4014 code');
         /**
          * If the websocket closed with a 4014 code, this means that we
          * should not manually attempt to reconnect but there is a chance
@@ -58,21 +61,27 @@ export async function connectToChannel (channel: VoiceChannel): Promise<VoiceCon
           connection,
           VoiceConnectionStatus.Connecting,
           5000
-        ).catch(() => connection.destroy());
+        ).catch(() => safelyDestroyConnection(connection));
       } else if (connection.rejoinAttempts < 5) {
         // The disconnect is recoverable, and we have < 5 attempts so we
         // will reconnect
         setTimeout(connection.rejoin, (connection.rejoinAttempts + 1) * 5_000);
       } else {
         // The disconnect is recoverable, but we have no more attempts
-        if (connection.state.status !== VoiceConnectionStatus.Destroyed) {
-          connection.destroy();
-        }
+        safelyDestroyConnection(connection);
       }
     });
     return connection;
   } catch (error) {
-    connection.destroy();
+    safelyDestroyConnection(connection);
     throw error;
   }
+}
+
+function safelyDestroyConnection (connection: VoiceConnection): void {
+  if (connection.state.status === VoiceConnectionStatus.Destroyed) {
+    console.log('Tried to destroy a connection when it was already destroyed.');
+    return;
+  }
+  connection.destroy();
 }
