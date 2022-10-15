@@ -14,6 +14,7 @@ client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
 
   const user = await interaction.guild?.members.fetch(interaction.user.id);
+  console.log(`${interaction.user.username} used a command: ${interaction.toString()}`);
   if (user?.nickname === 'Dorsan') {
     return await interaction.reply('אתה מכוער');
   }

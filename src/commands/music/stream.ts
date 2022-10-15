@@ -34,10 +34,12 @@ export async function execute (interaction: CommandInteraction, client: Client):
     const res = await fetch(apiUrlWithQuery);
     const queryResults = await res.json() as youtubeResponse;
     if (queryResults.items.length === 0) {
+      console.log('queryResults.items.length === 0');
       await interaction.editReply('something went wrong while fetching the query results!');
       return;
     }
     if (queryResults.items[0].id.videoId === null) {
+      console.log('queryResults.items[0].id.videoId === null');
       await interaction.editReply(`invalid query result! ${JSON.stringify(queryResults)}`);
       return;
     }
@@ -58,6 +60,7 @@ export async function execute (interaction: CommandInteraction, client: Client):
     requestingUser: interaction.user
   };
   serverQueue.addSongToQueue(newSong);
+  console.log(`added ${newSong.info.videoDetails.title} to queue. queue length: ${serverQueue.getQueuedSongs().length}`);
   interaction.editReply(`Added **${newSong.info.videoDetails.title}** to queue! position in queue: ${serverQueue.getQueuedSongs().length}`).catch(console.error);
   const shouldPlaySongImmediately: boolean = player.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
   if (shouldPlaySongImmediately) {
@@ -69,8 +72,6 @@ export async function execute (interaction: CommandInteraction, client: Client):
     const resource = getSongResourceByYouTubeUrl(nextSong.url);
     player.play(resource);
   }
-
-  console.log('queued songs:', serverQueue.getQueuedSongs().length);
 }
 
 interface youtubeResponse {
