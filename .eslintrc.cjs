@@ -13,7 +13,7 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 12,
-    project: "./tsconfig.eslint.json",
+    project: "./tsconfig.json",
     tsconfigRootDir: __dirname,
     sourceType: "module",
   },
@@ -30,8 +30,7 @@ module.exports = {
       "error",
       { max: 150, skipBlankLines: true, skipComments: true },
     ],
-    indent: ["error", "tab", { SwitchCase: 1 }],
-    quotes: ["error", "single", { avoidEscape: true }],
+    indent: 0,
     semi: ["error", "always"],
     "no-empty": [
       "error",
@@ -51,7 +50,7 @@ module.exports = {
     "no-labels": "error",
     "no-inline-comments": "error",
     eqeqeq: "error",
-    "no-console": "error",
+    "no-console": 0,
     "no-eval": "error",
     "no-implicit-globals": "error",
     "no-useless-call": "error",
@@ -211,13 +210,6 @@ module.exports = {
       ],
       rules: {
         "no-console": "off",
-      },
-    },
-    {
-      files: ["./inflint.config.cjs"],
-      rules: {
-        quotes: "off",
-        "no-useless-escape": "off",
       },
     },
     {
