@@ -35,6 +35,7 @@ export async function connectToChannel (channel: VoiceChannel): Promise<VoiceCon
     guildId: channel.guild.id,
     adapterCreator: channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
   });
+  connection.configureNetworking();
   try {
     await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
     connection.on('stateChange', (_, newState) => {
@@ -80,7 +81,7 @@ export async function connectToChannel (channel: VoiceChannel): Promise<VoiceCon
 
 function safelyDestroyConnection (connection: VoiceConnection): void {
   if (connection.state.status === VoiceConnectionStatus.Destroyed) {
-    console.log('Tried to destroy a connection when it was already destroyed.');
+    console.log('[Warning] Tried to destroy a connection when it was already destroyed.');
     return;
   }
   connection.destroy();
