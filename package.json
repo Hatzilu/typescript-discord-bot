@@ -7,6 +7,8 @@
     "build": "tsc",
     "start": "node build/index.js",
     "dev": "concurrently \"tsc -w\" \"nodemon build/index.js\"",
+    "prettier": "prettier --check **/*.{ts,js,cjs,json,yaml}",
+    "lint": "eslint -c ./.eslintrc.cjs --ignore-pattern \"apps\" --ignore-pattern \"packages\" \"**/*.{ts,js,cjs}\" --resolve-plugins-relative-to .",
     "deploy:commands": "tsc && node build/deploy-commands.js"
   },
   "keywords": [],
