@@ -1,6 +1,4 @@
 module.exports = {
-	plugins: [require("prettier-plugin-sh")],
-	pluginSearchDirs: false,
 	tabWidth: 4,
 	printWidth: 110,
 	useTabs: true,

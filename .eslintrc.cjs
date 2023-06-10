@@ -3,12 +3,7 @@ module.exports = {
 	env: {
 		node: true,
 	},
-	extends: [
-		'eslint:recommended',
-		'plugin:@typescript-eslint/recommended',
-		'plugin:import/typescript',
-		'prettier',
-	],
+	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:import/typescript'],
 	reportUnusedDisableDirectives: true,
 	parser: '@typescript-eslint/parser',
 	parserOptions: {
