@@ -1,0 +1,15 @@
+module.exports = {
+	plugins: [require("prettier-plugin-sh")],
+	pluginSearchDirs: false,
+	tabWidth: 4,
+	printWidth: 110,
+	useTabs: true,
+	semi: true,
+	singleQuote: true,
+	quoteProps: "consistent",
+	trailingComma: "all",
+	bracketSpacing: true,
+	arrowParens: "always",
+	bracketSameLine: false,
+	indent: 4,
+};
