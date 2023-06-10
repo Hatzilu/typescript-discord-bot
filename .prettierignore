@@ -5,7 +5,4 @@ dist
 pnpm-lock.yaml
 terraform
 .github
-auth-state.json
-.next
 out
-*.scss.d.ts
