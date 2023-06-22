@@ -1,5 +1,4 @@
 import { CommandInteraction, HexColorString, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import fetch, { Response } from 'node-fetch';
 
 export const data = new SlashCommandBuilder()
 	.setName('rice')
@@ -16,7 +15,7 @@ export async function execute(interaction: CommandInteraction) {
 		interaction.editReply('sorry, something went wrong...').catch(console.error);
 		return;
 	}
-	let randomPost: RedditPost = getRandomPost(posts);
+	let randomPost = getRandomPost(posts);
 	while (
 		randomPost.data.is_video ??
 		!randomPost.data.url.endsWith('png') ??
@@ -35,11 +34,11 @@ export async function execute(interaction: CommandInteraction) {
 	}
 }
 
-function getRandomPost(posts: RedditPost[]): RedditPost {
+function getRandomPost(posts: RedditPost[]) {
 	const index = Math.ceil(Math.random() * posts.length);
 	const post = posts[index];
 	posts.splice(index, 1); // remove the item from cache
-	return post;
+	return post as RedditPost;
 }
 
 function getRedditPostEmbed(randomPost: RedditPost) {
@@ -59,7 +58,7 @@ async function getPostsFromAPIorCache(): Promise<RedditPost[]> {
 	if (postCache.length > 0) {
 		return postCache;
 	}
-	const response: Response = await fetch(
+	const response: any = await fetch(
 		'https://www.reddit.com/r/unixporn/top.json?sort=top&t=all&limit=100&q=cat&nsfw=1&include_over_18=on',
 	);
 	const json = (await response.json()) as RedditResponse;

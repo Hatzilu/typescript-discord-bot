@@ -1,7 +1,7 @@
-import { client } from './bot';
+import client from './bot';
 import { createRestApi } from './rest-api';
 
-const PORT = process.env.PORT ?? 8000;
+const PORT = process.env['PORT'] ?? 8000;
 
 const api = createRestApi(client);
 

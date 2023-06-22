@@ -1,5 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
 import { serverQueue } from './music-utils';
 
 export const data = new SlashCommandBuilder().setName('queue').setDescription('display all queued songs');

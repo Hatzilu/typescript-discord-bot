@@ -29,6 +29,7 @@ client.on('interactionCreate', async (interaction) => {
 	const { commandName } = interaction;
 
 	if (commandName in commands) {
+		// @ts-expect-error execute does not exist
 		commands[commandName as keyof typeof commands].execute(interaction, client);
 
 		return;
