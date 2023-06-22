@@ -2,24 +2,39 @@ import { Client } from 'discord.js';
 import { config, BOT_INTENTS } from './config';
 import * as commandModules from './commands';
 
-const commands = Object(commandModules);
+const commands = new Object(commandModules);
 
-export const client = new Client({ intents: BOT_INTENTS });
-
-client.once('ready', () => {
-  console.log('Canni is up ^^');
+const client = new Client({
+	intents: BOT_INTENTS,
+	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 
-client.on('interactionCreate', async interaction => {
-  if (!interaction.isCommand()) return;
+client.once('ready', () => {
+	console.log('Canni is up ^^');
+});
 
-  const user = await interaction.guild?.members.fetch(interaction.user.id);
-  if (user?.nickname === 'Dorsan') {
-    return await interaction.reply('אתה מכוער');
-  }
+client.on('interactionCreate', async (interaction) => {
+	if (!interaction.isCommand()) {
+		return;
+	}
 
-  const { commandName } = interaction;
-  commands[commandName].execute(interaction, client);
+	const user = await interaction.guild?.members.fetch(interaction.user.id);
+
+	console.log(`${interaction.user.username} used a command: ${interaction.toString()}`);
+
+	if (user?.nickname === 'Dorsan') {
+		return await interaction.reply('אתה מכוער');
+	}
+
+	const { commandName } = interaction;
+
+	if (commandName in commands) {
+		commands[commandName as keyof typeof commands].execute(interaction, client);
+
+		return;
+	}
 });
 
 client.login(config.DISCORD_TOKEN).catch(console.error);
+
+export default client;

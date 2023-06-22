@@ -1,3 +1,4 @@
 {
-    "glassit.alpha": 230
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode"
 }

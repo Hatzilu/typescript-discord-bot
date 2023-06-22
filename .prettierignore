@@ -1,0 +1,8 @@
+node_modules
+build
+pnpm-workspace.yaml
+dist
+pnpm-lock.yaml
+terraform
+.github
+out
