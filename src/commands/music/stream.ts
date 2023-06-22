@@ -24,7 +24,7 @@ export async function execute(interaction: CommandInteraction) {
 	if (serverQueue.getTextChannel() === undefined) {
 		serverQueue.setTextChannel(interaction.channel as TextChannel);
 	}
-	let queryUrlOrString = (interaction.options.data[0]?.value as string) || '';
+	let queryUrlOrString = interaction.options.data[0]?.value?.toString() || '';
 	if (queryUrlOrString === null) {
 		await interaction.editReply('please provide a url!');
 		return;
@@ -33,7 +33,7 @@ export async function execute(interaction: CommandInteraction) {
 	if (queryIsKeywords) {
 		const apiUrlWithQuery = youtubeApiUrl.replace('{QUERY}', queryUrlOrString);
 		const res = await fetch(apiUrlWithQuery);
-		const queryResults = (await res.json()) as youtubeResponse;
+		const queryResults = (await res.json()) as YoutubeResponse;
 		if (queryResults.items.length === 0) {
 			console.log('queryResults.items.length === 0');
 			await interaction.editReply('something went wrong while fetching the query results!');
@@ -87,7 +87,7 @@ export async function execute(interaction: CommandInteraction) {
 	}
 }
 
-interface youtubeResponse {
+interface YoutubeResponse {
 	kind: string;
 	etag: string;
 	nextPageToken: string;
@@ -96,10 +96,10 @@ interface youtubeResponse {
 		totalResults: number;
 		resultsPerPage: number;
 	};
-	items: youtubeResponseItem[];
+	items: YoutubeResponseItem[];
 }
 
-interface youtubeResponseItem {
+interface YoutubeResponseItem {
 	kind: string;
 	etag: string;
 	id: {
