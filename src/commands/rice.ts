@@ -1,5 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Client, CommandInteraction, HexColorString, MessageEmbed } from 'discord.js';
+import { CommandInteraction, HexColorString, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import fetch, { Response } from 'node-fetch';
 
 export const data = new SlashCommandBuilder()
@@ -8,7 +7,7 @@ export const data = new SlashCommandBuilder()
 
 const postCache: RedditPost[] = [];
 
-export async function execute(interaction: CommandInteraction, client: Client): Promise<void> {
+export async function execute(interaction: CommandInteraction) {
 	await interaction.deferReply();
 
 	const posts = await getPostsFromAPIorCache();
@@ -43,13 +42,15 @@ function getRandomPost(posts: RedditPost[]): RedditPost {
 	return post;
 }
 
-function getRedditPostEmbed(randomPost: RedditPost): MessageEmbed {
-	return new MessageEmbed()
+function getRedditPostEmbed(randomPost: RedditPost) {
+	return new EmbedBuilder()
 		.setColor((randomPost.data.link_flair_background_color as HexColorString) ?? 0x0099ff)
 		.setTitle(randomPost.data.title)
 		.setURL('https://www.reddit.com' + randomPost.data.permalink)
-		.addField('Upvotes', randomPost.data.ups.toString(), true)
-		.addField('Submitted by', randomPost.data.author)
+		.addFields([
+			{ name: 'Upvotes', value: randomPost.data.ups.toString(), inline: true },
+			{ name: 'Submitted by', value: randomPost.data.author },
+		])
 		.setImage(randomPost.data.url)
 		.setTimestamp(randomPost.data.created * 1000);
 }
