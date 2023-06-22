@@ -1,6 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Client, CommandInteraction, HexColorString, MessageEmbed } from 'discord.js';
-import fetch, { Response } from 'node-fetch';
+import { CommandInteraction, HexColorString, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('rice')
@@ -8,7 +6,7 @@ export const data = new SlashCommandBuilder()
 
 const postCache: RedditPost[] = [];
 
-export async function execute(interaction: CommandInteraction, client: Client): Promise<void> {
+export async function execute(interaction: CommandInteraction) {
 	await interaction.deferReply();
 
 	const posts = await getPostsFromAPIorCache();
@@ -17,7 +15,7 @@ export async function execute(interaction: CommandInteraction, client: Client): 
 		interaction.editReply('sorry, something went wrong...').catch(console.error);
 		return;
 	}
-	let randomPost: RedditPost = getRandomPost(posts);
+	let randomPost = getRandomPost(posts);
 	while (
 		randomPost.data.is_video ??
 		!randomPost.data.url.endsWith('png') ??
@@ -36,20 +34,22 @@ export async function execute(interaction: CommandInteraction, client: Client): 
 	}
 }
 
-function getRandomPost(posts: RedditPost[]): RedditPost {
+function getRandomPost(posts: RedditPost[]) {
 	const index = Math.ceil(Math.random() * posts.length);
 	const post = posts[index];
 	posts.splice(index, 1); // remove the item from cache
-	return post;
+	return post as RedditPost;
 }
 
-function getRedditPostEmbed(randomPost: RedditPost): MessageEmbed {
-	return new MessageEmbed()
+function getRedditPostEmbed(randomPost: RedditPost) {
+	return new EmbedBuilder()
 		.setColor((randomPost.data.link_flair_background_color as HexColorString) ?? 0x0099ff)
 		.setTitle(randomPost.data.title)
 		.setURL('https://www.reddit.com' + randomPost.data.permalink)
-		.addField('Upvotes', randomPost.data.ups.toString(), true)
-		.addField('Submitted by', randomPost.data.author)
+		.addFields([
+			{ name: 'Upvotes', value: randomPost.data.ups.toString(), inline: true },
+			{ name: 'Submitted by', value: randomPost.data.author },
+		])
 		.setImage(randomPost.data.url)
 		.setTimestamp(randomPost.data.created * 1000);
 }
@@ -58,7 +58,7 @@ async function getPostsFromAPIorCache(): Promise<RedditPost[]> {
 	if (postCache.length > 0) {
 		return postCache;
 	}
-	const response: Response = await fetch(
+	const response: any = await fetch(
 		'https://www.reddit.com/r/unixporn/top.json?sort=top&t=all&limit=100&q=cat&nsfw=1&include_over_18=on',
 	);
 	const json = (await response.json()) as RedditResponse;

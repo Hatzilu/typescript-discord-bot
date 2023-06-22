@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { BitFieldResolvable, IntentsString } from 'discord.js';
+import { GatewayIntentBits } from 'discord.js';
 dotenv.config();
 
 const { CLIENT_ID, GUILD_ID, DISCORD_TOKEN, YOUTUBE_API_KEY } = process.env;
@@ -12,12 +12,12 @@ export const config = {
 };
 throwErrIfEnvironmentVarsAreMissing(config);
 
-export const BOT_INTENTS: BitFieldResolvable<IntentsString, number> = [
-	'GUILDS',
-	'GUILD_MEMBERS',
-	'GUILD_MESSAGES',
-	'DIRECT_MESSAGES',
-	'GUILD_VOICE_STATES',
+export const BOT_INTENTS = [
+	GatewayIntentBits.Guilds,
+	GatewayIntentBits.GuildMembers,
+	GatewayIntentBits.GuildMessages,
+	GatewayIntentBits.DirectMessages,
+	GatewayIntentBits.GuildVoiceStates,
 ];
 
 function throwErrIfEnvironmentVarsAreMissing(environmentVars: NodeJS.ProcessEnv) {
