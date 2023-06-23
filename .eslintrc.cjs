@@ -140,7 +140,7 @@ module.exports = {
 		'import/no-commonjs': ['error'],
 		'import/no-amd': ['error'],
 		'import/first': ['error'],
-		'import/exports-last': ['error'],
+		'import/exports-last': 'off',
 		'import/no-duplicates': ['error'],
 		'import/newline-after-import': ['error'],
 		'import/no-named-default': ['error'],
