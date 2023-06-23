@@ -118,7 +118,7 @@ module.exports = {
 		'@typescript-eslint/no-require-imports': ['error'],
 		'@typescript-eslint/no-non-null-assertion': 'off',
 		'@typescript-eslint/no-use-before-define': ['error'],
-		'@typescript-eslint/consistent-type-imports': ['error'],
+		'@typescript-eslint/consistent-type-imports': 'off',
 		'@typescript-eslint/await-thenable': 'error',
 		'@typescript-eslint/explicit-member-accessibility': [
 			'error',
@@ -140,7 +140,7 @@ module.exports = {
 		'import/no-commonjs': ['error'],
 		'import/no-amd': ['error'],
 		'import/first': ['error'],
-		'import/exports-last': ['error'],
+		'import/exports-last': 'off',
 		'import/no-duplicates': ['error'],
 		'import/newline-after-import': ['error'],
 		'import/no-named-default': ['error'],

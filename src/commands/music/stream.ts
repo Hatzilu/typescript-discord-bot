@@ -1,12 +1,10 @@
 import ytdl from 'ytdl-core';
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
-import { CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
+import audioPlayer from '../../lib/audioPlayer';
 import { Song } from '../../types';
-import { getSongResourceByYouTubeUrl } from '../../utils';
-import { serverQueue, player, connectToChannel } from './music-utils';
 import { config } from '../../config';
-// import fetch from 'node-fetch';
+import { serverQueue, connectToChannel, playSong } from '../../lib/music-utils';
 
 const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?key=${config.YOUTUBE_API_KEY}&type=video&q={QUERY}`;
 
@@ -21,38 +19,52 @@ export async function execute(interaction: CommandInteraction) {
 	await interaction.deferReply();
 	const member = interaction.member as GuildMember;
 	const voiceChannel = member.voice.channel as VoiceChannel;
+
 	if (serverQueue.getTextChannel() === undefined) {
 		serverQueue.setTextChannel(interaction.channel as TextChannel);
 	}
+
 	let queryUrlOrString = interaction.options.data[0]?.value?.toString() || '';
+
 	if (queryUrlOrString === null) {
 		await interaction.editReply('please provide a url!');
+
 		return;
 	}
+
 	const queryIsKeywords = !ytdl.validateURL(queryUrlOrString) && typeof queryUrlOrString === 'string';
+
 	if (queryIsKeywords) {
 		const apiUrlWithQuery = youtubeApiUrl.replace('{QUERY}', queryUrlOrString);
 		const res = await fetch(apiUrlWithQuery);
 		const queryResults = (await res.json()) as YoutubeResponse;
+
 		if (queryResults.items.length === 0) {
 			console.log('queryResults.items.length === 0');
 			await interaction.editReply('something went wrong while fetching the query results!');
+
 			return;
 		}
+
 		const videoId = queryResults.items[0]?.id?.videoId || '';
+
 		if (!videoId) {
 			console.log('queryResults.items[0].id.videoId === null');
 			await interaction.editReply(`invalid query result! ${JSON.stringify(queryResults)}`);
+
 			return;
 		}
+
 		queryUrlOrString = `https://www.youtube.com/watch?v=${videoId}`;
 	}
+
 	const connection = await connectToChannel(voiceChannel);
 
-	const audioPlayerSubscription = connection.subscribe(player);
+	const audioPlayerSubscription = connection.subscribe(audioPlayer);
 
 	if (audioPlayerSubscription === undefined) {
 		await interaction.editReply('Unable to subscribe to AudioPlayer, please open a support ticket.');
+
 		return;
 	}
 
@@ -61,6 +73,7 @@ export async function execute(interaction: CommandInteraction) {
 		info: await ytdl.getInfo(queryUrlOrString),
 		requestingUser: interaction.user,
 	};
+
 	serverQueue.addSongToQueue(newSong);
 	console.log(
 		`added ${newSong.info.videoDetails.title} to queue. queue length: ${
@@ -75,15 +88,18 @@ export async function execute(interaction: CommandInteraction) {
 		)
 		.catch(console.error);
 	const shouldPlaySongImmediately: boolean =
-		player.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
+		audioPlayer.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
+
 	if (shouldPlaySongImmediately) {
 		const nextSong = serverQueue.getFirstSong();
+
 		if (nextSong === undefined) {
 			console.log('nextSong is undefined');
+
 			return;
 		}
-		const resource = getSongResourceByYouTubeUrl(nextSong.url);
-		player.play(resource);
+
+		playSong(nextSong, audioPlayer);
 	}
 }
 
