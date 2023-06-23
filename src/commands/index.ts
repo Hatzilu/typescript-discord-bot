@@ -12,4 +12,8 @@ export * as queue from './music/queue';
 
 export * as skip from './music/skip';
 
+export * as pause from './music/pause';
+
+export * as resume from './music/resume';
+
 export * as say from './say';
