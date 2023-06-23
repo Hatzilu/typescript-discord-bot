@@ -1,5 +1,7 @@
 import {
 	AudioPlayer,
+	AudioPlayerStatus,
+	AudioResource,
 	createAudioResource,
 	DiscordGatewayAdapterCreator,
 	entersState,
@@ -35,9 +37,7 @@ export function getSongResourceBySongObject(song: Song) {
 
 	const resource = createAudioResource(stream, {
 		inputType: StreamType.Arbitrary,
-		metadata: {
-			title: song.info.videoDetails.title,
-		},
+		metadata: song.info.videoDetails,
 	});
 
 	return resource;
@@ -52,6 +52,18 @@ export function playSong(song: Song, player: AudioPlayer) {
 	const resource = getSongResourceBySongObject(song);
 
 	player.play(resource);
+}
+
+/**
+ * Returns the currently playing resource in AudioPlayer if it is currently playing a resource.
+ * @param {AudioPlayer} player - DiscordJS AudioPlayer
+ */
+export function getCurrentlyPlayingSong(player: AudioPlayer) {
+	if (player.state.status !== AudioPlayerStatus.Playing) {
+		return;
+	}
+
+	return player.state.resource as AudioResource<ytdl.VideoDetails>;
 }
 
 export async function connectToChannel(channel: VoiceChannel): Promise<VoiceConnection> {

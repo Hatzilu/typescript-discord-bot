@@ -16,4 +16,6 @@ export * as pause from './music/pause';
 
 export * as resume from './music/resume';
 
+export * as lyrics from './music/lyrics';
+
 export * as say from './say';
