@@ -15,15 +15,11 @@ export async function execute(interaction: CommandInteraction) {
 	const member = interaction.member as GuildMember;
 	const voiceChannel = member.voice.channel as VoiceChannel;
 
-	console.log(interaction.options.data);
-
 	let numberOfSongs = Number(interaction.options.data[0]?.value?.toString()) || 1;
 
 	if (serverQueue.getTextChannel() === undefined) {
 		serverQueue.setTextChannel(interaction.channel as TextChannel);
 	}
-
-	console.log(audioPlayer.state.status);
 
 	if (serverQueue.getQueuedSongs().length === 0 && audioPlayer.state.status !== AudioPlayerStatus.Playing) {
 		await interaction.editReply('There are no songs to skip!');
@@ -72,6 +68,8 @@ export async function execute(interaction: CommandInteraction) {
 	}
 
 	playSong(nextSong, audioPlayer);
+
+	console.log(`Skipping ${numberOfSongs} song(s)`);
 
 	if (numberOfSongs > 1) {
 		await interaction.editReply(`Skipping ${numberOfSongs} songs...`);
