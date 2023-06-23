@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
+import { AudioPlayerStatus } from '@discordjs/voice';
 import { connectToChannel, getSongResourceBySongObject, player, serverQueue } from './music-utils';
 
 export const data = new SlashCommandBuilder()
@@ -21,7 +22,9 @@ export async function execute(interaction: CommandInteraction) {
 		serverQueue.setTextChannel(interaction.channel as TextChannel);
 	}
 
-	if (serverQueue.getQueuedSongs().length === 0) {
+	console.log(player.state.status);
+
+	if (serverQueue.getQueuedSongs().length === 0 && player.state.status !== AudioPlayerStatus.Playing) {
 		await interaction.editReply('There are no songs to skip!');
 
 		return;
@@ -31,10 +34,15 @@ export async function execute(interaction: CommandInteraction) {
 		numberOfSongs = 1;
 	}
 
+	// Handle cases where the user skips multiple songs
 	if (numberOfSongs > 1) {
 		console.log({ numberOfSongs });
 
-		for (let i = 0; i < numberOfSongs || serverQueue.getQueuedSongs().length < 2; i++) {
+		for (let i = 0; i < numberOfSongs; i++) {
+			if (serverQueue.getQueuedSongs().length < 1) {
+				return;
+			}
+
 			const song = serverQueue.getNextSong();
 
 			console.log('skipping the song ', song?.info?.videoDetails?.title || song?.url || '');
@@ -42,13 +50,7 @@ export async function execute(interaction: CommandInteraction) {
 		}
 	}
 
-	const nextSong = serverQueue.getQueuedSongs()[0] || '';
-
-	if (!nextSong) {
-		await interaction.editReply('There are no songs to skip!');
-
-		return;
-	}
+	const nextSong = serverQueue.getQueuedSongs()[0];
 
 	const connection = await connectToChannel(voiceChannel);
 
@@ -56,6 +58,14 @@ export async function execute(interaction: CommandInteraction) {
 
 	if (audioPlayerSubscription === undefined) {
 		await interaction.editReply('Unable to subscribe to AudioPlayer, please open a support ticket.');
+
+		return;
+	}
+
+	if (!nextSong) {
+		player.stop();
+
+		await interaction.editReply('No more songs in queue, I will stop playing music.');
 
 		return;
 	}
