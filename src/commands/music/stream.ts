@@ -1,10 +1,10 @@
 import ytdl from 'ytdl-core';
 import { SlashCommandBuilder, CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
-
+import audioPlayer from '../../lib/audioPlayer';
 import { Song } from '../../types';
 import { config } from '../../config';
-import { serverQueue, player, connectToChannel, playSong } from './music-utils';
+import { serverQueue, connectToChannel, playSong } from '../../lib/music-utils';
 
 const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?key=${config.YOUTUBE_API_KEY}&type=video&q={QUERY}`;
 
@@ -60,7 +60,7 @@ export async function execute(interaction: CommandInteraction) {
 
 	const connection = await connectToChannel(voiceChannel);
 
-	const audioPlayerSubscription = connection.subscribe(player);
+	const audioPlayerSubscription = connection.subscribe(audioPlayer);
 
 	if (audioPlayerSubscription === undefined) {
 		await interaction.editReply('Unable to subscribe to AudioPlayer, please open a support ticket.');
@@ -88,7 +88,7 @@ export async function execute(interaction: CommandInteraction) {
 		)
 		.catch(console.error);
 	const shouldPlaySongImmediately: boolean =
-		player.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
+		audioPlayer.state.status === AudioPlayerStatus.Idle && serverQueue.getQueuedSongs().length > 0;
 
 	if (shouldPlaySongImmediately) {
 		const nextSong = serverQueue.getFirstSong();
@@ -99,7 +99,7 @@ export async function execute(interaction: CommandInteraction) {
 			return;
 		}
 
-		playSong(nextSong);
+		playSong(nextSong, audioPlayer);
 	}
 }
 

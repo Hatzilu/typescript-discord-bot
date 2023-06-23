@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
-import { connectToChannel, playSong, player, serverQueue } from './music-utils';
+import audioPlayer from '../../lib/audioPlayer';
+import { connectToChannel, playSong, serverQueue } from '../../lib/music-utils';
 
 export const data = new SlashCommandBuilder()
 	.setName('skip')
@@ -22,9 +23,9 @@ export async function execute(interaction: CommandInteraction) {
 		serverQueue.setTextChannel(interaction.channel as TextChannel);
 	}
 
-	console.log(player.state.status);
+	console.log(audioPlayer.state.status);
 
-	if (serverQueue.getQueuedSongs().length === 0 && player.state.status !== AudioPlayerStatus.Playing) {
+	if (serverQueue.getQueuedSongs().length === 0 && audioPlayer.state.status !== AudioPlayerStatus.Playing) {
 		await interaction.editReply('There are no songs to skip!');
 
 		return;
@@ -54,7 +55,7 @@ export async function execute(interaction: CommandInteraction) {
 
 	const connection = await connectToChannel(voiceChannel);
 
-	const audioPlayerSubscription = connection.subscribe(player);
+	const audioPlayerSubscription = connection.subscribe(audioPlayer);
 
 	if (audioPlayerSubscription === undefined) {
 		await interaction.editReply('Unable to subscribe to AudioPlayer, please open a support ticket.');
@@ -63,14 +64,14 @@ export async function execute(interaction: CommandInteraction) {
 	}
 
 	if (!nextSong) {
-		player.stop();
+		audioPlayer.stop();
 
 		await interaction.editReply('No more songs in queue, I will stop playing music.');
 
 		return;
 	}
 
-	playSong(nextSong);
+	playSong(nextSong, audioPlayer);
 
 	if (numberOfSongs > 1) {
 		await interaction.editReply(`Skipping ${numberOfSongs} songs...`);

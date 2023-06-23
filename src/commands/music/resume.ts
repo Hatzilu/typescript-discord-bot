@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, CommandInteraction, TextChannel } from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
-import { player, serverQueue } from './music-utils';
+import audioPlayer from '../../lib/audioPlayer';
+import { serverQueue } from '../../lib/music-utils';
 
 export const data = new SlashCommandBuilder().setName('resume').setDescription('resume current song');
 
@@ -11,12 +12,12 @@ export async function execute(interaction: CommandInteraction) {
 		serverQueue.setTextChannel(interaction.channel as TextChannel);
 	}
 
-	if (player.state.status === AudioPlayerStatus.Playing) {
+	if (audioPlayer.state.status === AudioPlayerStatus.Playing) {
 		await interaction.editReply("I'm already playing!");
 
 		return;
 	}
 
-	player.unpause();
+	audioPlayer.unpause();
 	await interaction.editReply('Resumed playing music.');
 }

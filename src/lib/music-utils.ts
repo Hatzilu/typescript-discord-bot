@@ -1,6 +1,5 @@
 import {
-	AudioPlayerStatus,
-	createAudioPlayer,
+	AudioPlayer,
 	createAudioResource,
 	DiscordGatewayAdapterCreator,
 	entersState,
@@ -14,11 +13,9 @@ import {
 import { VoiceChannel } from 'discord.js';
 import ytdl from 'ytdl-core';
 import { Song } from 'src/types';
-import { ServerQueue } from '../../lib/ServerQueue';
+import { ServerQueue } from './ServerQueue';
 
 export const serverQueue = new ServerQueue();
-
-export const player = createAudioPlayer();
 
 function safelyDestroyConnection(connection: VoiceConnection): void {
 	if (connection.state.status === VoiceConnectionStatus.Destroyed) {
@@ -50,47 +47,11 @@ export function getSongResourceBySongObject(song: Song) {
  * Play a song via DiscordJS AudioPlayer
  * @param {Song} song - song object
  */
-export function playSong(song: Song) {
+export function playSong(song: Song, player: AudioPlayer) {
 	const resource = getSongResourceBySongObject(song);
 
 	player.play(resource);
 }
-
-player.on(AudioPlayerStatus.Playing, () => {
-	const currentlyPlayingSong = serverQueue.getNextSong();
-
-	if (currentlyPlayingSong === undefined) {
-		return;
-	}
-
-	console.log(
-		`[Audio-Player] now playing: ${currentlyPlayingSong.url} by ${currentlyPlayingSong.requestingUser.username}`,
-	);
-
-	const channel = serverQueue.getTextChannel();
-
-	if (channel === undefined) {
-		return;
-	}
-
-	channel.send(`Now Playing: **${currentlyPlayingSong.info.videoDetails.title}**`).catch(console.error);
-});
-player.on(AudioPlayerStatus.Idle, () => {
-	const nextSong = serverQueue.getFirstSong();
-
-	console.log('[Audio-Player] player is idle');
-
-	if (nextSong === undefined) {
-		console.log('[Audio-Player] no more songs to play, returning from on.idle event...');
-
-		return;
-	}
-
-	console.log('[Audio-Player] next song: ', nextSong.url);
-	playSong(nextSong);
-});
-
-player.on('error', (err) => console.error('[Audio-Player] ', err));
 
 export async function connectToChannel(channel: VoiceChannel): Promise<VoiceConnection> {
 	const connection =
