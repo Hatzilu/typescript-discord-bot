@@ -4,7 +4,7 @@ import { AudioPlayerStatus } from '@discordjs/voice';
 
 import { Song } from '../../types';
 import { config } from '../../config';
-import { serverQueue, player, connectToChannel, getSongResourceBySongObject } from './music-utils';
+import { serverQueue, player, connectToChannel, playSong } from './music-utils';
 
 const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?key=${config.YOUTUBE_API_KEY}&type=video&q={QUERY}`;
 
@@ -99,9 +99,7 @@ export async function execute(interaction: CommandInteraction) {
 			return;
 		}
 
-		const resource = getSongResourceBySongObject(nextSong);
-
-		player.play(resource);
+		playSong(nextSong);
 	}
 }
 

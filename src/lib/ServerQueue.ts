@@ -9,31 +9,31 @@ export class ServerQueue {
 		this.songs = [];
 	}
 
-	getQueuedSongs(): Song[] {
+	public getQueuedSongs(): Song[] {
 		return this.songs;
 	}
 
-	addSongToQueue(newSong: Song): void {
+	public addSongToQueue(newSong: Song): void {
 		this.songs.push(newSong);
 	}
 
-	getNextSong(): Song | undefined {
+	public getNextSong(): Song | undefined {
 		return this.songs.shift();
 	}
 
-	getFirstSong(): Song | undefined {
+	public getFirstSong(): Song | undefined {
 		return this.songs[0];
 	}
 
-	getTextChannel(): TextChannel | undefined {
+	public getTextChannel(): TextChannel | undefined {
 		return this.textChannel;
 	}
 
-	setTextChannel(newChannel: TextChannel): void {
+	public setTextChannel(newChannel: TextChannel): void {
 		this.textChannel = newChannel;
 	}
 
-	clear(): void {
+	public clear(): void {
 		this.songs = [];
 	}
 }

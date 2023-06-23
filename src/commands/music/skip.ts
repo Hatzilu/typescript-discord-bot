@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
-import { connectToChannel, getSongResourceBySongObject, player, serverQueue } from './music-utils';
+import { connectToChannel, playSong, player, serverQueue } from './music-utils';
 
 export const data = new SlashCommandBuilder()
 	.setName('skip')
@@ -70,9 +70,7 @@ export async function execute(interaction: CommandInteraction) {
 		return;
 	}
 
-	const audioResource = getSongResourceBySongObject(nextSong);
-
-	player.play(audioResource);
+	playSong(nextSong);
 
 	if (numberOfSongs > 1) {
 		await interaction.editReply(`Skipping ${numberOfSongs} songs...`);

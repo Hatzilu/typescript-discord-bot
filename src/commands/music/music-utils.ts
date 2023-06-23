@@ -14,7 +14,7 @@ import {
 import { VoiceChannel } from 'discord.js';
 import ytdl from 'ytdl-core';
 import { Song } from 'src/types';
-import { ServerQueue } from '../../classes/ServerQueue';
+import { ServerQueue } from '../../lib/ServerQueue';
 
 export const serverQueue = new ServerQueue();
 
@@ -44,6 +44,16 @@ export function getSongResourceBySongObject(song: Song) {
 	});
 
 	return resource;
+}
+
+/**
+ * Play a song via DiscordJS AudioPlayer
+ * @param {Song} song - song object
+ */
+export function playSong(song: Song) {
+	const resource = getSongResourceBySongObject(song);
+
+	player.play(resource);
 }
 
 player.on(AudioPlayerStatus.Playing, () => {
@@ -76,10 +86,8 @@ player.on(AudioPlayerStatus.Idle, () => {
 		return;
 	}
 
-	console.log('[Audio-Player] next song: ', nextSong);
-	const resource = getSongResourceBySongObject(nextSong);
-
-	player.play(resource);
+	console.log('[Audio-Player] next song: ', nextSong.url);
+	playSong(nextSong);
 });
 
 player.on('error', (err) => console.error('[Audio-Player] ', err));
