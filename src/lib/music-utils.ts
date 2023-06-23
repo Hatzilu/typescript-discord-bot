@@ -46,6 +46,7 @@ export function getSongResourceBySongObject(song: Song) {
 /**
  * Play a song via DiscordJS AudioPlayer
  * @param {Song} song - song object
+ * @param {AudioPlayer} player - DiscordJS AudioPlayer
  */
 export function playSong(song: Song, player: AudioPlayer) {
 	const resource = getSongResourceBySongObject(song);
