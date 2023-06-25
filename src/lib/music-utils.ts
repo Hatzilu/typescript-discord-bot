@@ -27,17 +27,21 @@ function safelyDestroyConnection(connection: VoiceConnection): void {
 	connection.destroy();
 }
 
+/**
+ * Get AudioResource from a Song object using ytdl. This will prefer opus codecs if possible. Livestreams can't use opus afaik.
+ * @param {Song} song - song object
+ * @returns {AudioResource<ytdl.videoInfo>} AudioResource with ytdl metadata.
+ */
 export function getSongResourceBySongObject(song: Song) {
 	const stream = ytdl(song.url, {
 		filter: 'audioonly',
 		highWaterMark: 1 << 25,
+		quality: 'highestaudio',
 	});
 
 	const resource = createAudioResource(stream, {
-		inputType: StreamType.Arbitrary,
-		metadata: {
-			title: song.info.videoDetails.title,
-		},
+		inputType: song.info.videoDetails.isLiveContent ? StreamType.Arbitrary : StreamType.WebmOpus,
+		metadata: song.info,
 	});
 
 	return resource;
