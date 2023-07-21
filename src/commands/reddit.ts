@@ -9,7 +9,7 @@ export const data = new SlashCommandBuilder()
 		option.setName('subreddit').setDescription('the subreddit to fetch from').setRequired(true),
 	);
 
-const postCache: RedditPost[] = [];
+const postCache = new Map<string, RedditPost[]>();
 
 export async function execute(interaction: CommandInteraction) {
 	await interaction.deferReply();
@@ -20,7 +20,7 @@ export async function execute(interaction: CommandInteraction) {
 
 	const posts = await getPostsFromAPIorCache(postCache, subreddit);
 
-	if (posts.length === 0) {
+	if (!posts || posts.length === 0) {
 		interaction.editReply('sorry, something went wrong...').catch(console.error);
 
 		return;

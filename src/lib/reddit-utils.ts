@@ -12,12 +12,16 @@ export function getRandomPost(posts: RedditPost[]) {
 }
 
 export function getRedditPostEmbed(randomPost: RedditPost) {
+	console.log(randomPost);
+
+	const backgroundColor = !randomPost.data.link_flair_background_color
+		? '#0099FF'
+		: randomPost.data.link_flair_background_color.startsWith('#')
+		? (randomPost.data.link_flair_background_color as HexColorString)
+		: (`#${randomPost.data.link_flair_background_color}` as HexColorString);
+
 	const embed = new EmbedBuilder()
-		.setColor(
-			(randomPost.data.link_flair_background_color as HexColorString)
-				? `#${randomPost.data.link_flair_background_color}`
-				: 0x0099ff,
-		)
+		.setColor(backgroundColor)
 		.setTitle(randomPost.data.title)
 		.setURL('https://www.reddit.com' + randomPost.data.permalink)
 		.addFields([
@@ -33,12 +37,9 @@ export function getRedditPostEmbed(randomPost: RedditPost) {
 	return embed.toJSON();
 }
 
-export async function getPostsFromAPIorCache(
-	postCache: RedditPost[],
-	subreddit: string,
-): Promise<RedditPost[]> {
-	if (postCache.length > 0) {
-		return postCache;
+export async function getPostsFromAPIorCache(postCache: Map<string, RedditPost[]>, subreddit: string) {
+	if (postCache.get(subreddit)?.length) {
+		return postCache.get(subreddit);
 	}
 
 	const response: any = await fetch(
@@ -49,7 +50,7 @@ export async function getPostsFromAPIorCache(
 
 	console.log({ d: json.data.children });
 
-	postCache.push(...json.data.children);
+	postCache.set(subreddit, json.data.children);
 
 	return json.data.children;
 }
