@@ -10,6 +10,11 @@ export type RedditResponse = {
 	};
 };
 
+export type RedditResponseError = {
+	message: string;
+	error: number;
+};
+
 export type RedditPost = {
 	kind: string;
 	data: {
@@ -18,6 +23,7 @@ export type RedditPost = {
 		downs: number;
 		ups: number;
 		url: string;
+		thumbnail: string;
 		permalink: string;
 		is_video: boolean;
 		link_flair_background_color: string;

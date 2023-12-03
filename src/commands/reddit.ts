@@ -1,5 +1,10 @@
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { getPostsFromAPIorCache, getRandomPost, getRedditPostEmbed } from '../lib/reddit-utils';
+import {
+	buildRedditErrorEmbed,
+	getPostsFromAPIorCache,
+	getRandomPost,
+	getRedditPostEmbed,
+} from '../lib/reddit-utils';
 import { RedditPost } from '../types/reddit.types';
 
 export const data = new SlashCommandBuilder()
@@ -19,6 +24,22 @@ export async function execute(interaction: CommandInteraction) {
 	console.log({ subreddit });
 
 	const posts = await getPostsFromAPIorCache(postCache, subreddit);
+
+	console.log({ posts });
+
+	if (!posts) {
+		interaction.editReply('sorry, something went wrong...').catch(console.error);
+
+		return;
+	}
+
+	if ('error' in posts) {
+		const errorEmbed = buildRedditErrorEmbed(posts);
+
+		interaction.editReply({ embeds: [errorEmbed] }).catch(console.error);
+
+		return;
+	}
 
 	if (!posts || posts.length === 0) {
 		interaction.editReply('sorry, something went wrong...').catch(console.error);
