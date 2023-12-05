@@ -4,7 +4,7 @@ export * as help from './help';
 
 export * as greet from './greet';
 
-export * as rice from './rice';
+export * as reddit from './reddit';
 
 export * as stream from './music/stream';
 
