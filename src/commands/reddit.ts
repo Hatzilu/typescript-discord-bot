@@ -4,6 +4,7 @@ import {
 	getPostsFromAPIorCache,
 	getRandomPost,
 	getRedditPostEmbed,
+	isRedditPostInvalid,
 } from '../lib/reddit-utils';
 import { RedditPost } from '../types/reddit.types';
 
@@ -49,11 +50,7 @@ export async function execute(interaction: CommandInteraction) {
 
 	let randomPost = getRandomPost(posts);
 
-	while (
-		randomPost.data.is_video ??
-		!randomPost.data.url.endsWith('png') ??
-		!randomPost.data.url.endsWith('jpg')
-	) {
+	while (isRedditPostInvalid(randomPost)) {
 		randomPost = getRandomPost(posts);
 	}
 
@@ -68,6 +65,6 @@ export async function execute(interaction: CommandInteraction) {
 			);
 		}
 
-		console.error(error);
+		console.error(`failed to create embed!!`, error);
 	}
 }

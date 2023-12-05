@@ -20,11 +20,20 @@ export function getRedditPostEmbed(randomPost: RedditPost) {
 		? (randomPost.data.link_flair_background_color as HexColorString)
 		: (`#${randomPost.data.link_flair_background_color}` as HexColorString);
 
+	let title = randomPost.data.title;
+
+	// If title is too long for discord embed, truncate it and add ... at the end
+	if (title.length > 256) {
+		const charArray = [...title].map((l, i) => (i > 252 ? null : l)).filter(Boolean);
+
+		title = [...charArray, ...new Array(3).fill('.')].join('');
+		console.log(`trunating title: `, { old: randomPost.data.title, new: title });
+	}
+
 	const embed = new EmbedBuilder()
 		.setColor(backgroundColor)
-		.setTitle(randomPost.data.title)
+		.setTitle(title)
 		.setURL('https://www.reddit.com' + randomPost.data.permalink)
-		.setThumbnail(randomPost.data.thumbnail)
 		.addFields([
 			{ name: 'Upvotes', value: randomPost.data.ups.toString() || '0', inline: true },
 			{ name: 'Submitted by', value: randomPost.data.author || 'unknown' },
@@ -96,3 +105,15 @@ export async function getPostsFromAPIorCache(postCache: Map<string, RedditPost[]
 
 	return json.data.children;
 }
+
+/**
+ * Filter out video posts, nsfw posts, or stuff that generally doesn't fit embeds
+ * @param {RedditPost} post
+ */
+export const isRedditPostInvalid = (post: RedditPost) => {
+	if (!post.data) {
+		return false;
+	}
+
+	return post.data.is_video ?? !post.data.url.match(/(https?:\/\/.*\.(?:png|jpg))/i);
+};
