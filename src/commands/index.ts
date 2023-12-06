@@ -10,6 +10,8 @@ export * as fisheye from './images/fisheye';
 
 export * as rotate from './images/rotate';
 
+export * as todo from './todo';
+
 export * as stream from './music/stream';
 
 export * as queue from './music/queue';
