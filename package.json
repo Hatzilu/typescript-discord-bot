@@ -30,6 +30,7 @@
 		"firebase": "9.4.1",
 		"jimp": "^0.22.10",
 		"libsodium-wrappers": "^0.7.10",
+		"mongoose": "^8.0.2",
 		"typescript": "^4.9.5",
 		"ytdl-core": "4.11.4"
 	},
