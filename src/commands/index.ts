@@ -6,6 +6,10 @@ export * as greet from './greet';
 
 export * as reddit from './reddit';
 
+export * as fisheye from './images/fisheye';
+
+export * as rotate from './images/rotate';
+
 export * as stream from './music/stream';
 
 export * as queue from './music/queue';
