@@ -5,9 +5,13 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
+	StringSelectMenuOptionBuilder,
+	StringSelectMenuBuilder,
+	ComponentType,
 } from 'discord.js';
 import mongoose from 'mongoose';
 import { todoModel } from '../schemas/todo';
+import { handleEditTodoCollector } from '../lib/todo-utils';
 
 export const data = new SlashCommandBuilder()
 	.setName('todo')
@@ -28,7 +32,7 @@ export const data = new SlashCommandBuilder()
 	);
 
 export async function execute(interaction: CommandInteraction): Promise<void> {
-	await interaction.deferReply();
+	await interaction.deferReply({ ephemeral: true });
 	// @ts-expect-error getSubcommand doesn't exist
 	const command = interaction.options.getSubcommand();
 
@@ -54,7 +58,40 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
 			break;
 		}
+		case 'edit': {
+			const todos = await todoModel.find().where('userId').equals(interaction.user.id);
 
+			const options = todos.map((todo) =>
+				new StringSelectMenuOptionBuilder().setLabel(todo.name || 'N/A').setValue(todo?.name),
+			);
+
+			const select = new StringSelectMenuBuilder()
+				.setCustomId(interaction.id)
+				.setPlaceholder('Select a task to edit.')
+				.addOptions(options);
+
+			const row = new ActionRowBuilder().addComponents(select);
+
+			const message = await interaction.editReply({
+				content: 'Choose a task',
+				// @ts-expect-error row
+				components: [row],
+			});
+
+			try {
+				const collector = message.createMessageComponentCollector({
+					componentType: ComponentType.StringSelect,
+					filter: (i) => i.user.id === interaction.user.id && i.customId === interaction.id,
+					time: 30000,
+				});
+
+				collector.on('collect', (int) => handleEditTodoCollector(int, interaction.user.id));
+			} catch (error) {
+				console.error('FUCK ', error);
+			}
+
+			break;
+		}
 		case 'add': {
 			// @ts-expect-error fuck idk man
 			const todoName = interaction.options.getString('name');
@@ -90,15 +127,15 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 			const todoName = interaction.options.getString('name');
 
 			// Check if it exists
-			// const existingTodo = await todoModel.findOne({ userId: interaction.user.id, name: todoName });
+			const existingTodo = await todoModel.findOne({ userId: interaction.user.id, name: todoName });
 
-			// if (!existingTodo) {
-			// 	await interaction.editReply(
-			// 		`There's no task with that name! did you mispell your task name?`,
-			// 	);
+			if (!existingTodo) {
+				await interaction.editReply(
+					`There's no task with that name! did you mispell your task name?`,
+				);
 
-			// 	return;
-			// }
+				return;
+			}
 
 			const confirm = new ButtonBuilder()
 				.setCustomId('confirm')
@@ -118,11 +155,9 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 				components: [row],
 			});
 
-			const collectorFilter = (i) => i.user.id === interaction.user.id;
-
 			try {
 				const confirmation = await deleteMessageResponse.awaitMessageComponent({
-					filter: collectorFilter,
+					filter: (i) => i.user.id === interaction.user.id,
 					time: 60000,
 				});
 
