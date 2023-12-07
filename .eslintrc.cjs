@@ -14,7 +14,7 @@ module.exports = {
 	},
 	plugins: ['@typescript-eslint', 'unused-imports', 'import', 'deprecation', 'unicorn'],
 	rules: {
-		'capitalized-comments': ['error'],
+		'capitalized-comments': ['off'],
 		'max-lines': ['error', { max: 150, skipBlankLines: true, skipComments: true }],
 		'indent': 0,
 		'semi': ['error', 'always'],
