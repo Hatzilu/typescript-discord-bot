@@ -134,7 +134,7 @@ module.exports = {
 		'import/no-useless-path-segments': ['error'],
 		'import/export': ['error'],
 		'import/no-deprecated': ['error'],
-		'import/no-extraneous-dependencies': ['error'],
+		'import/no-extraneous-dependencies': ['off'],
 		'import/no-mutable-exports': ['error'],
 		'import/no-unused-modules': ['error'],
 		'import/no-commonjs': ['error'],
