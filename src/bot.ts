@@ -1,8 +1,11 @@
 import { Client, Partials } from 'discord.js';
 import { config, BOT_INTENTS } from './config';
 import * as commandModules from './commands';
+import { initializeMongoDB } from './mongodb';
 
 const commands = new Object(commandModules);
+
+initializeMongoDB();
 
 const client = new Client({
 	intents: BOT_INTENTS,

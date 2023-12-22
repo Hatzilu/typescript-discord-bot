@@ -3,7 +3,8 @@ import { GatewayIntentBits } from 'discord.js';
 
 dotenv.config();
 
-const { CLIENT_ID, GUILD_ID, DISCORD_TOKEN, YOUTUBE_API_KEY } = process.env;
+const { CLIENT_ID, GUILD_ID, DISCORD_TOKEN, YOUTUBE_API_KEY, MONGODB_URL, STEAM_PORT_REDIRECT_URL } =
+	process.env;
 
 function throwErrIfEnvironmentVarsAreMissing(environmentVars: NodeJS.ProcessEnv) {
 	Object.values(environmentVars).forEach((v) => {
@@ -18,6 +19,8 @@ const config = {
 	GUILD_ID: GUILD_ID ?? '',
 	DISCORD_TOKEN: DISCORD_TOKEN ?? '',
 	YOUTUBE_API_KEY: YOUTUBE_API_KEY ?? '',
+	MONGODB_URL: MONGODB_URL ?? '',
+	STEAM_PORT_REDIRECT_URL: STEAM_PORT_REDIRECT_URL ?? '',
 };
 
 throwErrIfEnvironmentVarsAreMissing(config);
