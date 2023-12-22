@@ -1,9 +1,9 @@
 import { Client, Partials } from 'discord.js';
 import DisTube from 'distube';
+import SpotifyPlugin from '@distube/spotify';
 import { config, BOT_INTENTS } from './config';
 import * as commandModules from './commands';
 import { initializeMongoDB } from './mongodb';
-import SpotifyPlugin from '@distube/spotify';
 
 const commands = new Object(commandModules);
 
