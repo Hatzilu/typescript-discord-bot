@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, GuildMember } from 'discord.js';
+import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
 import { distube } from '../../bot';
 
 export const data = new SlashCommandBuilder()
@@ -15,5 +15,7 @@ export async function execute(interaction: CommandInteraction) {
 		return;
 	}
 
-	distube.skip(interaction.guild?.id);
+	return await distube
+		.skip(interaction.guild?.id)
+		.then((song) => interaction.editReply(`Now Playing: **${song.name}**`));
 }
