@@ -20,6 +20,8 @@ export * as queue from './music/queue';
 
 export * as skip from './music/skip';
 
+export * as skipto from './music/skipto';
+
 export * as pause from './music/pause';
 
 export * as resume from './music/resume';

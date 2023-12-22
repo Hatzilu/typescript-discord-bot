@@ -2,14 +2,19 @@ import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
 import { distube } from '../../bot';
 
 export const data = new SlashCommandBuilder()
-	.setName('skip')
-	.setDescription('skip current song or X amount of songs in the queue ');
+	.setName('skipto')
+	.setDescription('skip to a specific song in the queue')
+	.addNumberOption((opt) =>
+		opt.setName('index').setDescription('The bot will skip to this song in the queue'),
+	);
 
 export async function execute(interaction: CommandInteraction) {
 	await interaction.deferReply();
 	const guildId = interaction.guild?.id;
 
-	if (!guildId) {
+	const index = interaction.options.get('index')?.value;
+
+	if (!guildId || typeof index !== 'number') {
 		await interaction.reply('Something went wrong while skipping the song');
 
 		return;
@@ -18,18 +23,18 @@ export async function execute(interaction: CommandInteraction) {
 	const queue = distube.getQueue(guildId);
 
 	if (!queue?.songs?.length) {
-		await interaction.reply('There are no songs to skip.');
+		await interaction.reply('There are no songs to skip to!');
 
 		return;
 	}
 
-	if (queue.songs.length === 1) {
-		return await distube
-			.skip(interaction.guild?.id)
-			.then(() => interaction.editReply(`No more songs to skip, the queue has been cleared.`));
+	if (!queue.songs[index - 1]) {
+		await interaction.reply('There is no song in that position!');
+
+		return;
 	}
 
 	return await distube
-		.skip(interaction.guild?.id)
+		.jump(guildId, index)
 		.then((song) => interaction.editReply(`Now Playing: **${song.name}**`));
 }
