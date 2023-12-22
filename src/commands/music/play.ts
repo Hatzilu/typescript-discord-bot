@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
+import { SlashCommandBuilder, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import { distube } from '../../bot';
 
 export const data = new SlashCommandBuilder()
@@ -13,7 +13,7 @@ export async function execute(interaction: CommandInteraction) {
 	const member = interaction.member as GuildMember;
 	const voiceChannel = member.voice.channel as VoiceChannel;
 
-	let queryUrlOrString = interaction.options.data[0]?.value?.toString() || '';
+	const queryUrlOrString = interaction.options.data[0]?.value?.toString() || '';
 
 	if (queryUrlOrString === null) {
 		await interaction.editReply('please provide a url!');
@@ -21,7 +21,10 @@ export async function execute(interaction: CommandInteraction) {
 		return;
 	}
 
-	distube.play(voiceChannel, queryUrlOrString, { message: await interaction.editReply('test') });
+	distube.play(voiceChannel, queryUrlOrString, {
+		message: await interaction.editReply(`**Now Playing:** ${queryUrlOrString}`),
+		member: member,
+	});
 }
 
 interface YoutubeResponse {

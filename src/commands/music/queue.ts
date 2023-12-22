@@ -19,7 +19,7 @@ export function execute(interaction: CommandInteraction): void {
 	}
 
 	const songListString = queue.songs.map(
-		(song, index) => `[${index + 1}]: ${song.name} requested by [${song.user}]`,
+		(song, index) => `[${index + 1}]: ${song.name} requested by [${song.user?.username}]`,
 	);
 
 	const codeBlockFormattedString: string = '```ini\n' + `${songListString.join('\r\n')}` + '```';
