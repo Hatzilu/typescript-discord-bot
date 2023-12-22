@@ -1,7 +1,9 @@
 import { Client, Partials } from 'discord.js';
+import DisTube from 'distube';
 import { config, BOT_INTENTS } from './config';
 import * as commandModules from './commands';
 import { initializeMongoDB } from './mongodb';
+import SpotifyPlugin from '@distube/spotify';
 
 const commands = new Object(commandModules);
 
@@ -42,3 +44,15 @@ client.on('interactionCreate', async (interaction) => {
 client.login(config.DISCORD_TOKEN).catch(console.error);
 
 export default client;
+
+export const distube = new DisTube(client, {
+	leaveOnStop: false,
+	emitNewSongOnly: true,
+	emitAddSongWhenCreatingQueue: false,
+	emitAddListWhenCreatingQueue: false,
+	plugins: [
+		new SpotifyPlugin({
+			emitEventsAfterFetching: true,
+		}),
+	],
+});

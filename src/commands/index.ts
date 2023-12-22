@@ -14,7 +14,7 @@ export * as todo from './todo';
 
 export * as connect from './connect';
 
-export * as stream from './music/stream';
+export * as play from './music/play';
 
 export * as queue from './music/queue';
 
