@@ -1,23 +1,19 @@
-import { SlashCommandBuilder, CommandInteraction, TextChannel } from 'discord.js';
-import { AudioPlayerStatus } from '@discordjs/voice';
-import audioPlayer from '../../lib/audioPlayer';
-import { serverQueue } from '../../lib/music-utils';
+import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import { distube } from '../../bot';
 
 export const data = new SlashCommandBuilder().setName('pause').setDescription('pause current song');
 
 export async function execute(interaction: CommandInteraction) {
 	await interaction.deferReply();
 
-	if (serverQueue.getTextChannel() === undefined) {
-		serverQueue.setTextChannel(interaction.channel as TextChannel);
-	}
+	const guildId = interaction.guild?.id;
 
-	if (audioPlayer.state.status === AudioPlayerStatus.Paused) {
-		await interaction.editReply("I'm already paused!");
+	if (!guildId) {
+		await interaction.editReply('Something went wrong while pausing the song');
 
 		return;
 	}
 
-	audioPlayer.pause();
+	distube.pause(guildId);
 	await interaction.editReply('Paused the music.');
 }
