@@ -1,21 +1,13 @@
 import {
-	AudioPlayer,
-	createAudioResource,
 	DiscordGatewayAdapterCreator,
 	entersState,
 	getVoiceConnection,
 	joinVoiceChannel,
-	StreamType,
 	VoiceConnection,
 	VoiceConnectionDisconnectReason,
 	VoiceConnectionStatus,
 } from '@discordjs/voice';
 import { VoiceChannel } from 'discord.js';
-import ytdl from 'ytdl-core';
-import { Song } from 'src/types';
-import { ServerQueue } from './ServerQueue';
-
-export const serverQueue = new ServerQueue();
 
 function safelyDestroyConnection(connection: VoiceConnection): void {
 	if (connection.state.status === VoiceConnectionStatus.Destroyed) {
@@ -25,37 +17,6 @@ function safelyDestroyConnection(connection: VoiceConnection): void {
 	}
 
 	connection.destroy();
-}
-
-/**
- * Get AudioResource from a Song object using ytdl. This will prefer opus codecs if possible. Livestreams can't use opus afaik.
- * @param {Song} song - song object
- * @returns {AudioResource<ytdl.videoInfo>} AudioResource with ytdl metadata.
- */
-export function getSongResourceBySongObject(song: Song) {
-	const stream = ytdl(song.url, {
-		filter: 'audioonly',
-		highWaterMark: 1 << 25,
-		quality: 'highestaudio',
-	});
-
-	const resource = createAudioResource(stream, {
-		inputType: song.info.videoDetails.isLiveContent ? StreamType.Arbitrary : StreamType.WebmOpus,
-		metadata: song.info,
-	});
-
-	return resource;
-}
-
-/**
- * Play a song via DiscordJS AudioPlayer
- * @param {Song} song - song object
- * @param {AudioPlayer} player - DiscordJS AudioPlayer
- */
-export function playSong(song: Song, player: AudioPlayer) {
-	const resource = getSongResourceBySongObject(song);
-
-	player.play(resource);
 }
 
 export async function connectToChannel(channel: VoiceChannel): Promise<VoiceConnection> {
