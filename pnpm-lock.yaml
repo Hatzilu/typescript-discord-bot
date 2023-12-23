@@ -10,7 +10,7 @@ dependencies:
     version: 0.8.0
   '@discordjs/voice':
     specifier: ^0.16.0
-    version: 0.16.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.1.0)
+    version: 0.16.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.2.0)
   '@distube/spotify':
     specifier: ^1.5.1
     version: 1.5.1(distube@4.1.1)
@@ -25,7 +25,7 @@ dependencies:
     version: 14.11.0
   distube:
     specifier: ^4.1.1
-    version: 4.1.1(@discordjs/opus@0.8.0)(@discordjs/voice@0.16.0)(discord.js@14.11.0)(ffmpeg-static@5.1.0)
+    version: 4.1.1(@discordjs/opus@0.8.0)(@discordjs/voice@0.16.0)(discord.js@14.11.0)(ffmpeg-static@5.2.0)
   dotenv:
     specifier: 10.0.0
     version: 10.0.0
@@ -33,8 +33,8 @@ dependencies:
     specifier: 4.17.1
     version: 4.17.1
   ffmpeg-static:
-    specifier: ^5.1.0
-    version: 5.1.0
+    specifier: ^5.2.0
+    version: 5.2.0
   firebase:
     specifier: 9.4.1
     version: 9.4.1
@@ -53,9 +53,6 @@ dependencies:
   typescript:
     specifier: ^4.9.5
     version: 4.9.5
-  ytdl-core:
-    specifier: 4.11.4
-    version: 4.11.4
 
 devDependencies:
   '@types/gamedig':
@@ -221,13 +218,13 @@ packages:
     engines: {node: '>=16.9.0'}
     dev: false
 
-  /@discordjs/voice@0.16.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.1.0):
+  /@discordjs/voice@0.16.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.2.0):
     resolution: {integrity: sha512-ToGCvHD1cBscuW3p+C7zOF5+L7MJmU4GjdOARfNk9mkHyFFZq4grK+Sxr3QXKbp27DtfDBc9uqD4GUOYgxngfA==}
     engines: {node: '>=16.9.0'}
     dependencies:
       '@types/ws': 8.5.5
       discord-api-types: 0.37.46
-      prism-media: 1.3.5(@discordjs/opus@0.8.0)(ffmpeg-static@5.1.0)
+      prism-media: 1.3.5(@discordjs/opus@0.8.0)(ffmpeg-static@5.2.0)
       tslib: 2.5.3
       ws: 8.13.0
     transitivePeerDependencies:
@@ -257,7 +254,7 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@distube/prism-media@1.0.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.1.0):
+  /@distube/prism-media@1.0.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.2.0):
     resolution: {integrity: sha512-UII2uqFH95uMPg4Z9yOJU3KJpb5vnrELBFXQYFhlBlk3GZ5wwDtt9fmR35PcqbqtnYGdtmUCCMucaSUeVlWrmw==}
     peerDependencies:
       '@discordjs/opus': '>=0.8.0 <1.0.0'
@@ -275,7 +272,7 @@ packages:
         optional: true
     dependencies:
       '@discordjs/opus': 0.8.0
-      ffmpeg-static: 5.1.0
+      ffmpeg-static: 5.2.0
     dev: false
 
   /@distube/spotify@1.5.1(distube@4.1.1):
@@ -283,7 +280,7 @@ packages:
     peerDependencies:
       distube: ^3.3.1||4
     dependencies:
-      distube: 4.1.1(@discordjs/opus@0.8.0)(@discordjs/voice@0.16.0)(discord.js@14.11.0)(ffmpeg-static@5.1.0)
+      distube: 4.1.1(@discordjs/opus@0.8.0)(@discordjs/voice@0.16.0)(discord.js@14.11.0)(ffmpeg-static@5.2.0)
       spotify-uri: 3.0.4
       spotify-url-info: 3.2.10
       spotify-web-api-node: 5.0.2
@@ -2355,7 +2352,7 @@ packages:
       - utf-8-validate
     dev: false
 
-  /distube@4.1.1(@discordjs/opus@0.8.0)(@discordjs/voice@0.16.0)(discord.js@14.11.0)(ffmpeg-static@5.1.0):
+  /distube@4.1.1(@discordjs/opus@0.8.0)(@discordjs/voice@0.16.0)(discord.js@14.11.0)(ffmpeg-static@5.2.0):
     resolution: {integrity: sha512-AMatU1/oIHEhK2mpwqNf/Hp/SksO/855qWSu5wbGpF4qMymmTestqPu41sM60AouhZk92a2iQYdPLngaBSLZHA==}
     engines: {node: '>=16.9.0'}
     peerDependencies:
@@ -2367,12 +2364,12 @@ packages:
         optional: true
     dependencies:
       '@discordjs/opus': 0.8.0
-      '@discordjs/voice': 0.16.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.1.0)
+      '@discordjs/voice': 0.16.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.2.0)
       '@distube/ytdl-core': 4.13.3
       '@distube/ytpl': 1.2.1
       '@distube/ytsr': 1.2.5
       discord.js: 14.11.0
-      prism-media: /@distube/prism-media@1.0.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.1.0)
+      prism-media: /@distube/prism-media@1.0.0(@discordjs/opus@0.8.0)(ffmpeg-static@5.2.0)
       tiny-typed-emitter: 2.1.0
       tough-cookie: 4.1.3
       tslib: 2.6.2
@@ -3027,8 +3024,8 @@ packages:
       websocket-driver: 0.7.4
     dev: false
 
-  /ffmpeg-static@5.1.0:
-    resolution: {integrity: sha512-eEWOiGdbf7HKPeJI5PoJ0oCwkL0hckL2JdS4JOuB/gUETppwkEpq8nF0+e6VEQnDCo/iuoipbTUsn9QJmtpNkg==}
+  /ffmpeg-static@5.2.0:
+    resolution: {integrity: sha512-WrM7kLW+do9HLr+H6tk7LzQ7kPqbAgLjdzNE32+u3Ff11gXt9Kkkd2nusGFrlWMIe+XaA97t+I8JS7sZIrvRgA==}
     engines: {node: '>=16'}
     requiresBuild: true
     dependencies:
@@ -4662,7 +4659,7 @@ packages:
     hasBin: true
     dev: true
 
-  /prism-media@1.3.5(@discordjs/opus@0.8.0)(ffmpeg-static@5.1.0):
+  /prism-media@1.3.5(@discordjs/opus@0.8.0)(ffmpeg-static@5.2.0):
     resolution: {integrity: sha512-IQdl0Q01m4LrkN1EGIE9lphov5Hy7WWlH6ulf5QdGePLlPas9p2mhgddTEHrlaXYjjFToM1/rWuwF37VF4taaA==}
     peerDependencies:
       '@discordjs/opus': '>=0.8.0 <1.0.0'
@@ -4680,7 +4677,7 @@ packages:
         optional: true
     dependencies:
       '@discordjs/opus': 0.8.0
-      ffmpeg-static: 5.1.0
+      ffmpeg-static: 5.2.0
     dev: false
 
   /process-nextick-args@2.0.1:
@@ -5892,12 +5889,3 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
-
-  /ytdl-core@4.11.4:
-    resolution: {integrity: sha512-tsVvqt++B5LSTMnCKQb4H/PFBewKj7gGPJ6KIM5gOFGMKNZj4qglGAl4QGFG8cNPP6wY54P80FDID5eN2di0GQ==}
-    engines: {node: '>=12'}
-    dependencies:
-      m3u8stream: 0.8.6
-      miniget: 4.2.2
-      sax: 1.2.4
-    dev: false
