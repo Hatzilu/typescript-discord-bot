@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, AttachmentBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, AttachmentBuilder } from 'discord.js';
 import Jimp from 'jimp';
 import { getLastChannelAttachment } from '../../lib/image-utils';
 
@@ -6,7 +6,7 @@ export const data = new SlashCommandBuilder()
 	.setName('fisheye')
 	.setDescription('Add a fisheye effect to the most recently posted image');
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
 	await interaction.deferReply();
 
 	const imageUrl = await getLastChannelAttachment(interaction);

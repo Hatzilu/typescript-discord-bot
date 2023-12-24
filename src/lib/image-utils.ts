@@ -1,6 +1,6 @@
-import { ChannelType, CommandInteraction } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction } from 'discord.js';
 
-export const getLastChannelAttachment = async (interaction: CommandInteraction) => {
+export const getLastChannelAttachment = async (interaction: ChatInputCommandInteraction) => {
 	if (interaction.channel?.type !== ChannelType.GuildText) {
 		throw new Error(
 			'Invalid channel type passed to getLastChannelAttachment, expected TextChannel, got ' +

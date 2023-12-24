@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
 import Gamedig from 'gamedig';
 import { config } from '../config';
@@ -45,7 +45,7 @@ export const data = new SlashCommandBuilder()
 		opt.setName('password').setDescription('Server password, leave empty if there is none'),
 	);
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
 	await interaction.deferReply();
 
 	const address = interaction.options.get('address')?.value;
