@@ -7,6 +7,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
 	const text = interaction.options.data?.[0]?.value?.toString() ?? 'text';
+
 	await interaction.deferReply();
 	await interaction.channel?.send(text);
 	await interaction.deleteReply();
