@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
+import { SlashCommandBuilder, CommandInteraction, GuildMember, VoiceChannel, TextChannel } from 'discord.js';
 import { normalizeSpotifyLocalizationLinks } from '../../lib/music-utils';
 import { CustomClient } from '../../types';
 
@@ -13,6 +13,7 @@ export async function execute(interaction: CommandInteraction, client: CustomCli
 	await interaction.deferReply();
 	const member = interaction.member as GuildMember;
 	const voiceChannel = member.voice.channel as VoiceChannel;
+	const textChannel = interaction.channel as TextChannel;
 	const guildId = interaction.guild?.id;
 
 	if (!guildId) {
@@ -37,27 +38,6 @@ export async function execute(interaction: CommandInteraction, client: CustomCli
 
 	queryUrlOrString = normalizeSpotifyLocalizationLinks(queryUrlOrString);
 
-	client.distube?.play(voiceChannel, queryUrlOrString, { member }).then(() => {
-		const songs = client.distube?.getQueue(guildId)?.songs;
-
-		if (!songs?.length) {
-			return;
-		}
-
-		const lastSong = songs[songs.length - 1];
-
-		if (!lastSong) {
-			return;
-		}
-
-		if (songs.length > 1) {
-			interaction.editReply(
-				`Adding **${lastSong.name}** to the queue, position in queue: ${songs.length} requested by ${lastSong.user?.username}`,
-			);
-
-			return;
-		}
-
-		interaction.editReply(`Now Playing: **${lastSong.name}** by ${lastSong.user?.username || 'unknown'}`);
-	});
+	client.distube?.play(voiceChannel, queryUrlOrString, { member, textChannel });
+	await interaction.editReply(`🔎 \`Searching for "${queryUrlOrString}"...\``);
 }
