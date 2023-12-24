@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 
 export function createRestApi(client: Client): express.Application {
 	const app = express();
+
 	app.use(express.json());
 
 	app.get('/messages', (req: Request, res: Response): void => {
@@ -11,6 +12,7 @@ export function createRestApi(client: Client): express.Application {
 
 			const messages = await thread.messages.fetch();
 			const jsonResponse: string = JSON.stringify(messages ?? []);
+
 			res.status(200).send(jsonResponse);
 		})().catch(console.error);
 	});
@@ -21,12 +23,15 @@ export function createRestApi(client: Client): express.Application {
 
 			const missingParams: boolean =
 				threadId === null ?? threadId === undefined ?? text === null ?? text === undefined;
-			if (missingParams) return res.status(400).send('missing request params');
+
+			if (missingParams) {return res.status(400).send('missing request params');}
 
 			const thread = (await client.channels.fetch(threadId as string)) as ThreadChannel;
 
 			const missingThread: boolean = threadId === null ?? threadId === undefined;
-			if (missingThread) res.status(404).send('Thread not found');
+
+			if (missingThread) {res.status(404).send('Thread not found');}
+
 			await thread.send(text);
 
 			return res.status(200).send('Message sent.');
@@ -51,6 +56,7 @@ async function getQueryParams(
 	client: Client,
 ): Promise<{ thread: ThreadChannel; threadId: any }> {
 	const { threadId } = req.query;
+
 	if (threadId === null ?? threadId === undefined) {
 		res.status(400).send('missing threadId');
 	}
