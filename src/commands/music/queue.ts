@@ -5,6 +5,9 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	ActionRowBuilder,
+	MappedInteractionTypes,
+	ComponentType,
+	MessageActionRowComponentBuilder,
 } from 'discord.js';
 import { Song } from 'distube';
 import { CustomClient } from '../../types';
@@ -40,8 +43,8 @@ const handleDisplayingQueue = async (
 	interaction: CommandInteraction,
 	songs: Song<unknown>[],
 	page: number,
-	confirmation?: any,
-) => {
+	confirmation?: MappedInteractionTypes<false>[ComponentType.Button],
+): Promise<void> => {
 	const songListEmbed = buildQueueEmbed(songs, page);
 	const totalPages = Math.ceil(songs.length / 10);
 
@@ -49,7 +52,7 @@ const handleDisplayingQueue = async (
 
 	const prev = new ButtonBuilder().setCustomId('back').setLabel('Back').setStyle(ButtonStyle.Primary);
 
-	const row = new ActionRowBuilder();
+	const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
 	console.log({ page, totalPages, totalSongs: songs.length });
 
@@ -69,7 +72,6 @@ const handleDisplayingQueue = async (
 		response = await confirmation.update({ embeds: [songListEmbed], components: [row] });
 	} else {
 		response = await interaction
-			// @ts-expect-error balls
 			.editReply({ embeds: [songListEmbed], components: [row] })
 			.catch(console.error);
 	}
@@ -78,12 +80,15 @@ const handleDisplayingQueue = async (
 		const newConfirmation = await response?.awaitMessageComponent({
 			filter: (i) => i.user.id === interaction.user.id,
 			time: 60000,
+			componentType: ComponentType.Button,
 		});
 
 		if (!newConfirmation) {
-			return await interaction
+			await interaction
 				.editReply('Something went wrong while resolving button interaction')
 				.catch(console.error);
+
+			return;
 		}
 
 		if (newConfirmation.customId === 'next') {
@@ -104,7 +109,7 @@ const handleDisplayingQueue = async (
 			return handleDisplayingQueue(interaction, songs, page, newConfirmation);
 		}
 	} catch (error) {
-		return await interaction.editReply({
+		await interaction.editReply({
 			content: 'Confirmation not received within 1 minute, cancelling',
 			components: [],
 		});
