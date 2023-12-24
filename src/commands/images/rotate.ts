@@ -14,7 +14,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 	const imageUrl = await getLastChannelAttachment(interaction);
 
-	const degrees = (interaction.options?.data[0]?.value ?? 90) as number;
+	const degrees = interaction.options.getNumber('degrees') ?? 90;
 
 	if (!imageUrl) {
 		await interaction.editReply('Could not resolve image URL.');

@@ -20,7 +20,7 @@ const postCache = new Map<string, RedditPost[]>();
 export async function execute(interaction: ChatInputCommandInteraction) {
 	await interaction.deferReply();
 
-	const subreddit = interaction.options.data[0]?.value?.toString() || '';
+	const subreddit = interaction.options.getString('subreddit', true);
 
 	console.log({ subreddit });
 
