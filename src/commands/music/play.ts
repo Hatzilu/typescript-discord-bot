@@ -13,6 +13,13 @@ export async function execute(interaction: CommandInteraction, client: CustomCli
 	await interaction.deferReply();
 	const member = interaction.member as GuildMember;
 	const voiceChannel = member.voice.channel as VoiceChannel;
+	const guildId = interaction.guild?.id;
+
+	if (!guildId) {
+		await interaction.editReply('Something went wrong, please try again later.');
+
+		return;
+	}
 
 	let queryUrlOrString = interaction.options.data[0]?.value?.toString() || '';
 
@@ -24,8 +31,27 @@ export async function execute(interaction: CommandInteraction, client: CustomCli
 
 	queryUrlOrString = normalizeSpotifyLocalizationLinks(queryUrlOrString);
 
-	client.distube?.play(voiceChannel, queryUrlOrString, {
-		message: await interaction.editReply(`**Now Playing:** ${queryUrlOrString}`),
-		member: member,
+	client.distube?.play(voiceChannel, queryUrlOrString, { member }).then(() => {
+		const songs = client.distube?.getQueue(guildId)?.songs;
+
+		if (!songs?.length) {
+			return;
+		}
+
+		const lastSong = songs[songs.length - 1];
+
+		if (!lastSong) {
+			return;
+		}
+
+		if (songs.length > 1) {
+			interaction.editReply(
+				`Adding **${lastSong.name}** to the queue, position in queue: ${songs.length} requested by ${lastSong.user?.username}`,
+			);
+
+			return;
+		}
+
+		interaction.editReply(`Now Playing: **${lastSong.name}** by ${lastSong.user?.username || 'unknown'}`);
 	});
 }
