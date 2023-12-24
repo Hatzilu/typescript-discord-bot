@@ -21,6 +21,12 @@ export async function execute(interaction: CommandInteraction, client: CustomCli
 		return;
 	}
 
+	if (!voiceChannel) {
+		await interaction.editReply('You must be in a voice channel to play music!');
+
+		return;
+	}
+
 	let queryUrlOrString = interaction.options.data[0]?.value?.toString() || '';
 
 	if (queryUrlOrString === null) {
