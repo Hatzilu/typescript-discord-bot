@@ -2,8 +2,6 @@ export * as ping from './ping';
 
 export * as help from './help';
 
-export * as greet from './greet';
-
 export * as reddit from './reddit';
 
 export * as fisheye from './images/fisheye';

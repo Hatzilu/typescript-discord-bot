@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
 import Gamedig from 'gamedig';
 import { config } from '../config';
@@ -9,7 +9,7 @@ const validateIPv4Address = (ip: string) => {
 	return regex.test(ip);
 };
 
-const buildConnectEmbed = (state: Gamedig.QueryResult, password?: string | number | boolean) => {
+const buildConnectEmbed = (state: Gamedig.QueryResult, password: string | null) => {
 	let steamRedirectUrl = `${config.STEAM_PORT_REDIRECT_URL}/?ip=${state.connect}`;
 
 	if (password) {
@@ -45,10 +45,10 @@ export const data = new SlashCommandBuilder()
 		opt.setName('password').setDescription('Server password, leave empty if there is none'),
 	);
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
 	await interaction.deferReply();
 
-	const address = interaction.options.get('address')?.value;
+	const address = interaction.options.getString('address', true);
 
 	if (!address || typeof address !== 'string') {
 		await interaction.editReply('Please provide a valid address!');
@@ -88,7 +88,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 	})
 		.then(async (state) => {
 			console.log(state);
-			const password = interaction.options.get('password')?.value;
+			const password = interaction.options.getString('password');
 			const embed = buildConnectEmbed(state, password);
 
 			await interaction.editReply({ embeds: [embed] });

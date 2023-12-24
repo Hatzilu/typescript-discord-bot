@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, AttachmentBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, AttachmentBuilder } from 'discord.js';
 import Jimp from 'jimp';
 import { getLastChannelAttachment } from '../../lib/image-utils';
 
@@ -9,12 +9,12 @@ export const data = new SlashCommandBuilder()
 		option.setName('degrees').setDescription('How many degrees to rotate, Default is 90.'),
 	);
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
 	await interaction.deferReply();
 
 	const imageUrl = await getLastChannelAttachment(interaction);
 
-	const degrees = (interaction.options?.data[0]?.value ?? 90) as number;
+	const degrees = interaction.options.getNumber('degrees') ?? 90;
 
 	if (!imageUrl) {
 		await interaction.editReply('Could not resolve image URL.');
