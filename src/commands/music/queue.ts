@@ -1,9 +1,9 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { serverQueue } from '../../lib/music-utils';
 
 export const data = new SlashCommandBuilder().setName('queue').setDescription('display all queued songs');
 
-export function execute(interaction: CommandInteraction): void {
+export function execute(interaction: ChatInputCommandInteraction): void {
 	if (serverQueue.getQueuedSongs().length === 0) {
 		interaction.reply('There are no songs in the queue!').catch(console.error);
 

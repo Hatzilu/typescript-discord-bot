@@ -1,4 +1,10 @@
-import { SlashCommandBuilder, CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
+import {
+	SlashCommandBuilder,
+	ChatInputCommandInteraction,
+	GuildMember,
+	TextChannel,
+	VoiceChannel,
+} from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
 import audioPlayer from '../../lib/audioPlayer';
 import { connectToChannel, playSong, serverQueue } from '../../lib/music-utils';
@@ -10,7 +16,7 @@ export const data = new SlashCommandBuilder()
 		option.setName('amount').setDescription('How many songs to skip in the queue'),
 	);
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
 	await interaction.deferReply();
 	const member = interaction.member as GuildMember;
 	const voiceChannel = member.voice.channel as VoiceChannel;

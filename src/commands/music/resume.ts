@@ -1,11 +1,11 @@
-import { SlashCommandBuilder, CommandInteraction, TextChannel } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, TextChannel } from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
 import audioPlayer from '../../lib/audioPlayer';
 import { serverQueue } from '../../lib/music-utils';
 
 export const data = new SlashCommandBuilder().setName('resume').setDescription('resume current song');
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
 	await interaction.deferReply();
 
 	if (serverQueue.getTextChannel() === undefined) {

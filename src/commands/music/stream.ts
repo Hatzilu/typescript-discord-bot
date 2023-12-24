@@ -1,5 +1,11 @@
 import ytdl from 'ytdl-core';
-import { SlashCommandBuilder, CommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
+import {
+	SlashCommandBuilder,
+	ChatInputCommandInteraction,
+	GuildMember,
+	TextChannel,
+	VoiceChannel,
+} from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
 import audioPlayer from '../../lib/audioPlayer';
 import { Song } from '../../types';
@@ -15,7 +21,7 @@ export const data = new SlashCommandBuilder()
 		option.setName('query').setDescription('Provide a song URL').setRequired(true),
 	);
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
 	await interaction.deferReply();
 	const member = interaction.member as GuildMember;
 	const voiceChannel = member.voice.channel as VoiceChannel;

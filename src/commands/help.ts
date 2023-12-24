@@ -1,4 +1,10 @@
-import { SlashCommandBuilder, Client, CommandInteraction, TextChannel, ChannelType } from 'discord.js';
+import {
+	SlashCommandBuilder,
+	Client,
+	TextChannel,
+	ChannelType,
+	ChatInputCommandInteraction,
+} from 'discord.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('help')
@@ -7,17 +13,23 @@ export const data = new SlashCommandBuilder()
 		option.setName('description').setDescription('Describe your problem').setRequired(true),
 	);
 
-export async function execute(interaction: CommandInteraction, client: Client): Promise<void> {
-	if (interaction.channelId === null ?? interaction.channelId === '') return;
+export async function execute(interaction: ChatInputCommandInteraction, client: Client): Promise<void> {
+	if (interaction.channelId === null ?? interaction.channelId === '') {
+		return;
+	}
+
 	const channel = await client.channels.fetch(interaction.channelId);
-	if (channel == null || channel?.type !== ChannelType.GuildText) return;
+
+	if (channel === null || channel?.type !== ChannelType.GuildText) {
+		return;
+	}
 
 	const thread = await (channel as TextChannel).threads.create({
 		name: `support-${Date.now()}`,
 		reason: `Support Ticket ${Date.now()}`,
 	});
 
-	const problemDescription = interaction.options?.data[0]?.value ?? '';
+	const problemDescription = interaction.options.getString('description', true);
 
 	const { user } = interaction;
 

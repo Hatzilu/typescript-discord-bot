@@ -1,6 +1,6 @@
 import {
 	SlashCommandBuilder,
-	CommandInteraction,
+	ChatInputCommandInteraction,
 	EmbedBuilder,
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -31,9 +31,8 @@ export const data = new SlashCommandBuilder()
 			.addStringOption((opt) => opt.setName('name').setDescription('Task name').setRequired(true)),
 	);
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
 	await interaction.deferReply({ ephemeral: true });
-	// @ts-expect-error getSubcommand doesn't exist
 	const command = interaction.options.getSubcommand();
 
 	console.log({ command });
@@ -93,7 +92,6 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 			break;
 		}
 		case 'add': {
-			// @ts-expect-error fuck idk man
 			const todoName = interaction.options.getString('name');
 
 			// Check if it already exists
@@ -123,7 +121,6 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 		}
 
 		case 'remove': {
-			// @ts-expect-error fuck idk man
 			const todoName = interaction.options.getString('name');
 
 			// Check if it exists
