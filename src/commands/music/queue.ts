@@ -1,28 +1,133 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import {
+	SlashCommandBuilder,
+	CommandInteraction,
+	EmbedBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	ActionRowBuilder,
+} from 'discord.js';
+import { Song } from 'distube';
 import { CustomClient } from '../../types';
 
 export const data = new SlashCommandBuilder().setName('queue').setDescription('display all queued songs');
 
-export function execute(interaction: CommandInteraction, client: CustomClient): void {
+const buildQueueEmbed = (songs: Song<unknown>[], page: number) => {
+	const startIndex = page * 10;
+	const songsToShow = songs.slice(startIndex, startIndex + 10);
+
+	const totalPages = Math.ceil(songs.length / 10);
+	const currentPage = page + 1;
+
+	const embed = new EmbedBuilder()
+		.setTitle('Queue')
+		.setDescription(`page ${currentPage} of ${totalPages}`)
+		.setFooter({ text: `${songs.length} song${songs.length > 1 ? 's' : ''} in queue` });
+
+	songsToShow.forEach((song, i) => {
+		const index = page === 0 ? (i + 1) * 1 : i + 1 + page * 10;
+
+		embed.addFields({
+			name: `#${index}`,
+			value: `[${song.name}](${song.url})`,
+			inline: false,
+		});
+	});
+
+	return embed;
+};
+
+const handleDisplayingQueue = async (
+	interaction: CommandInteraction,
+	songs: Song<unknown>[],
+	page: number,
+	confirmation?: any,
+) => {
+	const songListEmbed = buildQueueEmbed(songs, page);
+	const totalPages = Math.ceil(songs.length / 10);
+
+	const next = new ButtonBuilder().setCustomId('next').setLabel('Next').setStyle(ButtonStyle.Primary);
+
+	const prev = new ButtonBuilder().setCustomId('back').setLabel('Back').setStyle(ButtonStyle.Primary);
+
+	const row = new ActionRowBuilder();
+
+	console.log({ page, totalPages, totalSongs: songs.length });
+
+	if (page <= 0) {
+		prev.setDisabled(true);
+	}
+
+	if (page + 1 >= totalPages) {
+		next.setDisabled(true);
+	}
+
+	row.addComponents(prev, next);
+
+	let response;
+
+	if (confirmation) {
+		response = await confirmation.update({ embeds: [songListEmbed], components: [row] });
+	} else {
+		response = await interaction
+			// @ts-expect-error balls
+			.editReply({ embeds: [songListEmbed], components: [row] })
+			.catch(console.error);
+	}
+
+	try {
+		const newConfirmation = await response?.awaitMessageComponent({
+			filter: (i) => i.user.id === interaction.user.id,
+			time: 60000,
+		});
+
+		if (!newConfirmation) {
+			return await interaction
+				.editReply('Something went wrong while resolving button interaction')
+				.catch(console.error);
+		}
+
+		if (newConfirmation.customId === 'next') {
+			page += 1;
+
+			if (page > totalPages) {
+				page = totalPages;
+			}
+
+			return handleDisplayingQueue(interaction, songs, page, newConfirmation);
+		} else if (newConfirmation.customId === 'prev') {
+			page -= 1;
+
+			if (page < 0) {
+				page = 0;
+			}
+
+			return handleDisplayingQueue(interaction, songs, page, newConfirmation);
+		}
+	} catch (error) {
+		return await interaction.editReply({
+			content: 'Confirmation not received within 1 minute, cancelling',
+			components: [],
+		});
+	}
+};
+
+export async function execute(interaction: CommandInteraction, client: CustomClient) {
+	const page = 0;
+
+	await interaction.deferReply();
 	const queue = client.distube?.getQueue(interaction.guild?.id as string);
 
 	if (!queue) {
-		interaction.reply('There are no songs in the queue!').catch(console.error);
+		await interaction.editReply('There are no songs in the queue!').catch(console.error);
 
 		return;
 	}
 
 	if (queue?.songs?.length === 0) {
-		interaction.reply('There are no songs in the queue!').catch(console.error);
+		await interaction.editReply('There are no songs in the queue!').catch(console.error);
 
 		return;
 	}
 
-	const songListString = queue.songs.map(
-		(song, index) => `[${index + 1}]: ${song.name} requested by [${song.user?.username}]`,
-	);
-
-	const codeBlockFormattedString: string = '```ini\n' + `${songListString.join('\r\n')}` + '```';
-
-	interaction.reply(codeBlockFormattedString).catch(console.error);
+	handleDisplayingQueue(interaction, queue.songs, page);
 }
