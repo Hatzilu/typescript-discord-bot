@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
-import { distube } from '../../bot';
+import { CustomClient } from '../../types';
 
 export const data = new SlashCommandBuilder()
 	.setName('skipto')
@@ -8,7 +8,7 @@ export const data = new SlashCommandBuilder()
 		opt.setName('index').setDescription('The bot will skip to this song in the queue'),
 	);
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: CommandInteraction, client: CustomClient) {
 	await interaction.deferReply();
 	const guildId = interaction.guild?.id;
 
@@ -20,7 +20,7 @@ export async function execute(interaction: CommandInteraction) {
 		return;
 	}
 
-	const queue = distube.getQueue(guildId);
+	const queue = client.distube?.getQueue(guildId);
 
 	if (!queue?.songs?.length) {
 		await interaction.reply('There are no songs to skip to!');
@@ -34,7 +34,7 @@ export async function execute(interaction: CommandInteraction) {
 		return;
 	}
 
-	return await distube
-		.jump(guildId, index)
+	return await client.distube
+		?.jump(guildId, index)
 		.then((song) => interaction.editReply(`Now Playing: **${song.name}**`));
 }

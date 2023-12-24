@@ -1,9 +1,9 @@
 import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
-import { distube } from '../../bot';
+import { CustomClient } from '../../types';
 
 export const data = new SlashCommandBuilder().setName('resume').setDescription('resume current song');
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: CommandInteraction, client: CustomClient) {
 	await interaction.deferReply();
 	const guildId = interaction.guild?.id;
 
@@ -13,6 +13,6 @@ export async function execute(interaction: CommandInteraction) {
 		return;
 	}
 
-	distube.resume(guildId);
+	client.distube?.resume(guildId);
 	await interaction.editReply('Resumed playing music.');
 }

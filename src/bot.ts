@@ -4,14 +4,27 @@ import SpotifyPlugin from '@distube/spotify';
 import { config, BOT_INTENTS } from './config';
 import * as commandModules from './commands';
 import { initializeMongoDB } from './mongodb';
+import { CustomClient } from './types';
 
 const commands = new Object(commandModules);
 
 initializeMongoDB();
 
-const client = new Client({
+const client: CustomClient = new Client({
 	intents: BOT_INTENTS,
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
+});
+
+client.distube = new DisTube(client, {
+	leaveOnStop: false,
+	emitNewSongOnly: true,
+	emitAddSongWhenCreatingQueue: false,
+	emitAddListWhenCreatingQueue: false,
+	plugins: [
+		new SpotifyPlugin({
+			emitEventsAfterFetching: true,
+		}),
+	],
 });
 
 client.once('ready', () => {
@@ -44,15 +57,3 @@ client.on('interactionCreate', async (interaction) => {
 client.login(config.DISCORD_TOKEN).catch(console.error);
 
 export default client;
-
-export const distube = new DisTube(client, {
-	leaveOnStop: false,
-	emitNewSongOnly: true,
-	emitAddSongWhenCreatingQueue: false,
-	emitAddListWhenCreatingQueue: false,
-	plugins: [
-		new SpotifyPlugin({
-			emitEventsAfterFetching: true,
-		}),
-	],
-});

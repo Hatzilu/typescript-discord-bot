@@ -1,10 +1,10 @@
 import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
-import { distube } from '../../bot';
+import { CustomClient } from '../../types';
 
 export const data = new SlashCommandBuilder().setName('queue').setDescription('display all queued songs');
 
-export function execute(interaction: CommandInteraction): void {
-	const queue = distube.getQueue(interaction.guild?.id as string);
+export function execute(interaction: CommandInteraction, client: CustomClient): void {
+	const queue = client.distube?.getQueue(interaction.guild?.id as string);
 
 	if (!queue) {
 		interaction.reply('There are no songs in the queue!').catch(console.error);

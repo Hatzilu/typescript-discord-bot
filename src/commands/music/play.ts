@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import { normalizeSpotifyLocalizationLinks } from '../../lib/music-utils';
-import { distube } from '../../bot';
+import { CustomClient } from '../../types';
 
 export const data = new SlashCommandBuilder()
 	.setName('play')
@@ -9,7 +9,7 @@ export const data = new SlashCommandBuilder()
 		option.setName('query').setDescription('Provide a song URL').setRequired(true),
 	);
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: CommandInteraction, client: CustomClient) {
 	await interaction.deferReply();
 	const member = interaction.member as GuildMember;
 	const voiceChannel = member.voice.channel as VoiceChannel;
@@ -24,7 +24,7 @@ export async function execute(interaction: CommandInteraction) {
 
 	queryUrlOrString = normalizeSpotifyLocalizationLinks(queryUrlOrString);
 
-	distube.play(voiceChannel, queryUrlOrString, {
+	client.distube?.play(voiceChannel, queryUrlOrString, {
 		message: await interaction.editReply(`**Now Playing:** ${queryUrlOrString}`),
 		member: member,
 	});
