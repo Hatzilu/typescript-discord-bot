@@ -28,9 +28,11 @@ const buildQueueEmbed = (songs: Song<unknown>[], page: number) => {
 	songsToShow.forEach((song, i) => {
 		const index = page === 0 ? (i + 1) * 1 : i + 1 + page * 10;
 
+		const user = song.member?.displayName || song.user?.username || 'unknown';
+
 		embed.addFields({
 			name: `\u200B`,
-			value: `\`${index}.\` [${song.name}](${song.url})`,
+			value: `\`${index}.\` [${song.name}](${song.url}) |\`${song.formattedDuration} Requested by ${user}\``,
 			inline: false,
 		});
 	});
