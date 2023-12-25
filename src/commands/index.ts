@@ -14,6 +14,8 @@ export * as connect from './connect';
 
 export * as play from './music/play';
 
+export * as remove from './music/remove';
+
 export * as queue from './music/queue';
 
 export * as skip from './music/skip';
