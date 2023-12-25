@@ -1,21 +1,21 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { CustomClient } from '../../types';
 
 export const data = new SlashCommandBuilder()
 	.setName('skipto')
 	.setDescription('skip to a specific song in the queue')
 	.addNumberOption((opt) =>
-		opt.setName('index').setDescription('The bot will skip to this song in the queue'),
+		opt.setName('index').setDescription('The bot will skip to this song in the queue').setRequired(true),
 	);
 
-export async function execute(interaction: CommandInteraction, client: CustomClient) {
+export async function execute(interaction: ChatInputCommandInteraction, client: CustomClient) {
 	await interaction.deferReply();
 	const guildId = interaction.guild?.id;
 
-	const index = interaction.options.get('index')?.value;
+	const index = interaction.options.getNumber('index', true);
 
-	if (!guildId || typeof index !== 'number') {
-		await interaction.reply('Something went wrong while skipping the song');
+	if (!guildId) {
+		await interaction.editReply('Something went wrong while skipping the song');
 
 		return;
 	}
@@ -23,13 +23,13 @@ export async function execute(interaction: CommandInteraction, client: CustomCli
 	const queue = client.distube?.getQueue(guildId);
 
 	if (!queue?.songs?.length) {
-		await interaction.reply('There are no songs to skip to!');
+		await interaction.editReply('There are no songs to skip to!');
 
 		return;
 	}
 
 	if (!queue.songs[index - 1]) {
-		await interaction.reply('There is no song in that position!');
+		await interaction.editReply('There is no song in that position!');
 
 		return;
 	}

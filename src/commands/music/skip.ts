@@ -1,16 +1,16 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { CustomClient } from '../../types';
 
 export const data = new SlashCommandBuilder()
 	.setName('skip')
 	.setDescription('skip current song or X amount of songs in the queue ');
 
-export async function execute(interaction: CommandInteraction, client: CustomClient) {
+export async function execute(interaction: ChatInputCommandInteraction, client: CustomClient) {
 	await interaction.deferReply();
 	const guildId = interaction.guild?.id;
 
 	if (!guildId) {
-		await interaction.reply('Something went wrong while skipping the song');
+		await interaction.editReply('Something went wrong while skipping the song');
 
 		return;
 	}
@@ -18,7 +18,7 @@ export async function execute(interaction: CommandInteraction, client: CustomCli
 	const queue = client.distube?.getQueue(guildId);
 
 	if (!queue?.songs?.length) {
-		await interaction.reply('There are no songs to skip.');
+		await interaction.editReply('There are no songs to skip.');
 
 		return;
 	}
@@ -31,5 +31,5 @@ export async function execute(interaction: CommandInteraction, client: CustomCli
 
 	return await client.distube
 		?.skip(interaction.guild?.id)
-		.then((song) => interaction.editReply(`Now Playing: **${song.name}**`));
+		.then(() => interaction.editReply(`Skipping song...`));
 }
