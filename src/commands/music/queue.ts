@@ -1,6 +1,5 @@
 import {
 	SlashCommandBuilder,
-	CommandInteraction,
 	EmbedBuilder,
 	ButtonBuilder,
 	ButtonStyle,
@@ -8,6 +7,7 @@ import {
 	MappedInteractionTypes,
 	ComponentType,
 	MessageActionRowComponentBuilder,
+	ChatInputCommandInteraction,
 } from 'discord.js';
 import { Song } from 'distube';
 import { CustomClient } from '../../types';
@@ -22,16 +22,15 @@ const buildQueueEmbed = (songs: Song<unknown>[], page: number) => {
 	const currentPage = page + 1;
 
 	const embed = new EmbedBuilder()
-		.setTitle('Queue')
-		.setDescription(`page ${currentPage} of ${totalPages}`)
+		.setDescription(`**Page** \`${currentPage}\`**/**\`${totalPages}\``)
 		.setFooter({ text: `${songs.length} song${songs.length > 1 ? 's' : ''} in queue` });
 
 	songsToShow.forEach((song, i) => {
 		const index = page === 0 ? (i + 1) * 1 : i + 1 + page * 10;
 
 		embed.addFields({
-			name: `#${index}`,
-			value: `[${song.name}](${song.url})`,
+			name: `\u200B`,
+			value: `\`${index}.\` [${song.name}](${song.url})`,
 			inline: false,
 		});
 	});
@@ -40,7 +39,7 @@ const buildQueueEmbed = (songs: Song<unknown>[], page: number) => {
 };
 
 const handleDisplayingQueue = async (
-	interaction: CommandInteraction,
+	interaction: ChatInputCommandInteraction,
 	songs: Song<unknown>[],
 	page: number,
 	confirmation?: MappedInteractionTypes<false>[ComponentType.Button],
@@ -72,14 +71,17 @@ const handleDisplayingQueue = async (
 		response = await confirmation.update({ embeds: [songListEmbed], components: [row] });
 	} else {
 		response = await interaction
-			.editReply({ embeds: [songListEmbed], components: [row] })
+			.editReply({
+				embeds: [songListEmbed],
+				components: [row],
+			})
 			.catch(console.error);
 	}
 
 	try {
 		const newConfirmation = await response?.awaitMessageComponent({
 			filter: (i) => i.user.id === interaction.user.id,
-			time: 60000,
+			time: 30000,
 			componentType: ComponentType.Button,
 		});
 
@@ -108,15 +110,10 @@ const handleDisplayingQueue = async (
 
 			return handleDisplayingQueue(interaction, songs, page, newConfirmation);
 		}
-	} catch (error) {
-		await interaction.editReply({
-			content: 'Confirmation not received within 1 minute, cancelling',
-			components: [],
-		});
-	}
+	} catch (error) {}
 };
 
-export async function execute(interaction: CommandInteraction, client: CustomClient) {
+export async function execute(interaction: ChatInputCommandInteraction, client: CustomClient) {
 	const page = 0;
 
 	await interaction.deferReply();

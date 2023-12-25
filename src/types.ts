@@ -11,4 +11,4 @@ export interface Command {
  * which allows me to access in it every command via client.distube,
  * since i pass client as a parameter to every command.
  */
-export type CustomClient = Client<boolean> & { distube?: DisTube };
+export type CustomClient = Client<true> & { distube?: DisTube };
