@@ -11,9 +11,6 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: CommandInteraction, client: CustomClient) {
 	await interaction.deferReply();
-	const member = interaction.member as GuildMember;
-	const voiceChannel = member.voice.channel as VoiceChannel;
-	const textChannel = interaction.channel as TextChannel;
 	const guildId = interaction.guild?.id;
 
 	if (!guildId) {
@@ -21,6 +18,10 @@ export async function execute(interaction: CommandInteraction, client: CustomCli
 
 		return;
 	}
+
+	const member = interaction.member as GuildMember;
+	const voiceChannel = member.voice.channel as VoiceChannel;
+	const textChannel = interaction.channel as TextChannel;
 
 	if (!voiceChannel) {
 		await interaction.editReply('You must be in a voice channel to play music!');

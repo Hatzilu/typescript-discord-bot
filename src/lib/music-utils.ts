@@ -36,6 +36,23 @@ export const registerDisTubeEvents = (distube: DisTube) => {
 			}\` \n 🎧 **Requested by: ${song.user}**`,
 		);
 	});
+	distube.on('addList', (queue, playlist) => {
+		console.log('Add list event');
+
+		const firstPlaylistSong = playlist.songs[0];
+
+		if (!firstPlaylistSong) {
+			return;
+		}
+
+		const songIndex = queue.songs.findIndex((s) => s.id === firstPlaylistSong.id);
+
+		queue.textChannel?.send(
+			`🎶 **Queued \`${playlist.songs.length}\` songs from [${playlist.name}](${
+				playlist.url
+			})** 🎶\n 🕓 **Position in queue: ${songIndex + 1}** \n 🎧 **Requested by: ${playlist.user}**`,
+		);
+	});
 
 	distube.on('playSong', (queue, song) => {
 		queue.textChannel?.send(`▶️ **Now playing:** \`${song.name}\``);
