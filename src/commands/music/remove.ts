@@ -1,10 +1,4 @@
-import {
-	SlashCommandBuilder,
-	ChatInputCommandInteraction,
-	GuildMember,
-	VoiceChannel,
-	TextChannel,
-} from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import { CustomClient } from '../../types';
 
 export const data = new SlashCommandBuilder()
@@ -37,7 +31,6 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 		return;
 	}
 
-	const textChannel = interaction.channel as TextChannel;
 	const queue = client.distube?.getQueue(guildId);
 
 	if (!queue) {
