@@ -50,7 +50,7 @@ const handleDisplayingQueue = async (
 
 	const next = new ButtonBuilder().setCustomId('next').setLabel('Next').setStyle(ButtonStyle.Primary);
 
-	const prev = new ButtonBuilder().setCustomId('back').setLabel('Back').setStyle(ButtonStyle.Primary);
+	const prev = new ButtonBuilder().setCustomId('prev').setLabel('Back').setStyle(ButtonStyle.Primary);
 
 	const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
@@ -63,6 +63,8 @@ const handleDisplayingQueue = async (
 	if (page + 1 >= totalPages) {
 		next.setDisabled(true);
 	}
+
+	row.addComponents(prev, next);
 
 	const components = songs.length >= 10 ? [row] : [];
 
