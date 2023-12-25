@@ -33,7 +33,6 @@ const buildQueueEmbed = (songs: Song<unknown>[], page: number) => {
 		embed.addFields({
 			name: `\u200B`,
 			value: `\`${index}.\` [${song.name}](${song.url}) |\`${song.formattedDuration} Requested by ${user}\``,
-			inline: false,
 		});
 	});
 
@@ -65,17 +64,17 @@ const handleDisplayingQueue = async (
 		next.setDisabled(true);
 	}
 
-	row.addComponents(prev, next);
+	const components = songs.length >= 10 ? [row] : [];
 
 	let response;
 
 	if (confirmation) {
-		response = await confirmation.update({ embeds: [songListEmbed], components: [row] });
+		response = await confirmation.update({ embeds: [songListEmbed], components: components });
 	} else {
 		response = await interaction
 			.editReply({
 				embeds: [songListEmbed],
-				components: [row],
+				components: components,
 			})
 			.catch(console.error);
 	}
