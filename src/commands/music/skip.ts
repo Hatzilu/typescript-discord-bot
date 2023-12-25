@@ -6,11 +6,10 @@ export const data = new SlashCommandBuilder()
 	.setDescription('skip current song or X amount of songs in the queue ');
 
 export async function execute(interaction: ChatInputCommandInteraction, client: CustomClient) {
-	await interaction.deferReply();
 	const guildId = interaction.guild?.id;
 
 	if (!guildId) {
-		await interaction.editReply('Something went wrong while skipping the song');
+		await interaction.reply('Something went wrong while skipping the song');
 
 		return;
 	}
@@ -18,15 +17,17 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 	const queue = client.distube?.getQueue(guildId);
 
 	if (!queue?.songs?.length) {
-		await interaction.editReply('There are no songs to skip.');
+		await interaction.reply('There are no songs to skip.');
 
 		return;
 	}
 
 	if (queue.songs.length === 1) {
-		return await client.distube
-			?.skip(interaction.guild?.id)
-			.then(() => interaction.editReply(`No more songs to skip, the queue has been cleared.`));
+		await client.distube?.skip(interaction.guild?.id);
+
+		await interaction.reply(`No more songs to skip, the queue has been cleared.`);
+
+		return;
 	}
 
 	return await client.distube

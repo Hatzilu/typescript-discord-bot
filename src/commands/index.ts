@@ -16,6 +16,8 @@ export * as play from './music/play';
 
 export * as remove from './music/remove';
 
+export * as clear from './music/clear';
+
 export * as queue from './music/queue';
 
 export * as skip from './music/skip';
