@@ -1,19 +1,40 @@
 import { Client, Partials } from 'discord.js';
+import DisTube from 'distube';
+import SpotifyPlugin from '@distube/spotify';
 import { config, BOT_INTENTS } from './config';
 import * as commandModules from './commands';
 import { initializeMongoDB } from './mongodb';
+import { CustomClient } from './types';
+import { registerDisTubeEvents } from './lib/music-utils';
 
 const commands = new Object(commandModules);
 
 initializeMongoDB();
 
-const client = new Client({
+const client: CustomClient = new Client({
 	intents: BOT_INTENTS,
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
+client.distube = new DisTube(client, {
+	leaveOnStop: false,
+	emitNewSongOnly: true,
+	emitAddSongWhenCreatingQueue: false,
+	emitAddListWhenCreatingQueue: true,
+	plugins: [
+		new SpotifyPlugin({
+			emitEventsAfterFetching: true,
+		}),
+	],
+});
+
 client.once('ready', () => {
 	console.log('Canni is up ^^');
+
+	if (client.distube) {
+		registerDisTubeEvents(client.distube);
+		console.log('DisTube events successfully registered!');
+	}
 });
 
 client.on('interactionCreate', async (interaction) => {

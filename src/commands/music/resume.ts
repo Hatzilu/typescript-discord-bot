@@ -1,23 +1,18 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, TextChannel } from 'discord.js';
-import { AudioPlayerStatus } from '@discordjs/voice';
-import audioPlayer from '../../lib/audioPlayer';
-import { serverQueue } from '../../lib/music-utils';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { CustomClient } from '../../types';
 
 export const data = new SlashCommandBuilder().setName('resume').setDescription('resume current song');
 
-export async function execute(interaction: ChatInputCommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction, client: CustomClient) {
 	await interaction.deferReply();
+	const guildId = interaction.guild?.id;
 
-	if (serverQueue.getTextChannel() === undefined) {
-		serverQueue.setTextChannel(interaction.channel as TextChannel);
-	}
-
-	if (audioPlayer.state.status === AudioPlayerStatus.Playing) {
-		await interaction.editReply("I'm already playing!");
+	if (!guildId) {
+		await interaction.editReply('Something went wrong while resuming the song');
 
 		return;
 	}
 
-	audioPlayer.unpause();
+	client.distube?.resume(guildId);
 	await interaction.editReply('Resumed playing music.');
 }

@@ -1,113 +1,167 @@
-import {
-	AudioPlayer,
-	createAudioResource,
-	DiscordGatewayAdapterCreator,
-	entersState,
-	getVoiceConnection,
-	joinVoiceChannel,
-	StreamType,
-	VoiceConnection,
-	VoiceConnectionDisconnectReason,
-	VoiceConnectionStatus,
-} from '@discordjs/voice';
-import { VoiceChannel } from 'discord.js';
-import ytdl from 'ytdl-core';
-import { Song } from 'src/types';
-import { ServerQueue } from './ServerQueue';
+import { EmbedBuilder } from 'discord.js';
+import DisTube from 'distube';
+import { config } from '../config';
 
-export const serverQueue = new ServerQueue();
+/**
+ * some spotify links have a /intl-{country code}/ part in them that distube hates, so i'm cutting them out
+ * if it's not a spotify link, exit early.
+ * TODO: remove this function once 'spotify-uri' fixes the error these links cause, and once '@distube/spotify' updates their 'spotify-uri' package.
+ */
+export const normalizeSpotifyLocalizationLinks = (queryUrlOrString: string) => {
+	const spotifyLocalizedUrlRegex = new RegExp(
+		/https:\/\/open\.spotify\.com\/intl-(?<countryCode>.+?(?=\/))\//g,
+	);
 
-function safelyDestroyConnection(connection: VoiceConnection): void {
-	if (connection.state.status === VoiceConnectionStatus.Destroyed) {
-		console.log('Tried to destroy a connection when it was already destroyed.');
+	const result = spotifyLocalizedUrlRegex.exec(queryUrlOrString);
 
-		return;
+	if (result === null || !result?.groups) {
+		return queryUrlOrString;
 	}
 
-	connection.destroy();
+	const countryCode = result.groups['countryCode'];
+
+	return queryUrlOrString.replace(`/intl-${countryCode}`, '');
+};
+
+export const formatDurationInSeconds = (n: number): string => {
+	if (n < 0 || isNaN(n)) {
+		return 'N/A';
+	}
+
+	const hours = Math.floor(n / 3600);
+	const minutes = Math.floor((n % 3600) / 60);
+	const seconds = Math.floor(n % 60);
+
+	const formattedHours = String(hours).padStart(2, '0');
+	const formattedMinutes = String(minutes).padStart(2, '0');
+	const formattedSeconds = String(seconds).padStart(2, '0');
+
+	let duration = `${formattedMinutes}:${formattedSeconds}`;
+
+	if (hours > 0) {
+		duration = `${formattedHours}:${duration}`;
+	}
+
+	return duration;
+};
+
+export function formatViews(num: number) {
+	const lookup = [
+		{ value: 1, symbol: '' },
+		{ value: 1e3, symbol: 'k' },
+		{ value: 1e6, symbol: 'M' },
+		{ value: 1e9, symbol: 'G' },
+		{ value: 1e12, symbol: 'T' },
+		{ value: 1e15, symbol: 'P' },
+		{ value: 1e18, symbol: 'E' },
+	];
+
+	const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+
+	const item = lookup
+		.slice()
+		.reverse()
+		.find((item) => num >= item.value);
+
+	if (!item) {
+		return '0';
+	}
+
+	return (num / item.value).toFixed(1).replace(rx, '$1') + item.symbol;
 }
 
 /**
- * Get AudioResource from a Song object using ytdl. This will prefer opus codecs if possible. Livestreams can't use opus afaik.
- * @param {Song} song - song object
- * @returns {AudioResource<ytdl.videoInfo>} AudioResource with ytdl metadata.
+ * Set-up the DisTube event callbacks
+ * @param {DisTube} distube
  */
-export function getSongResourceBySongObject(song: Song) {
-	const stream = ytdl(song.url, {
-		filter: 'audioonly',
-		highWaterMark: 1 << 25,
-		quality: 'highestaudio',
-	});
+export const registerDisTubeEvents = (distube: DisTube) => {
+	distube.on('addSong', (queue, song) => {
+		console.log('Add song event');
+		const songIndex = queue.songs.length;
 
-	const resource = createAudioResource(stream, {
-		inputType: song.info.videoDetails.isLiveContent ? StreamType.Arbitrary : StreamType.WebmOpus,
-		metadata: song.info,
-	});
-
-	return resource;
-}
-
-/**
- * Play a song via DiscordJS AudioPlayer
- * @param {Song} song - song object
- * @param {AudioPlayer} player - DiscordJS AudioPlayer
- */
-export function playSong(song: Song, player: AudioPlayer) {
-	const resource = getSongResourceBySongObject(song);
-
-	player.play(resource);
-}
-
-export async function connectToChannel(channel: VoiceChannel): Promise<VoiceConnection> {
-	const connection =
-		getVoiceConnection(channel.guild.id) ??
-		joinVoiceChannel({
-			channelId: channel.id,
-			guildId: channel.guild.id,
-			adapterCreator: channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,
-		});
-
-	try {
-		await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
-		connection.on('stateChange', (_, newState) => {
-			console.log(`[Voice connection] state changed to ${newState.status}`);
-
-			if (newState.status !== VoiceConnectionStatus.Disconnected) {
-				return;
+		const totalSongsDuration = queue.songs.reduce((acc, b, i) => {
+			if (i + 1 === queue.songs.length) {
+				return acc;
 			}
 
-			if (
-				newState.reason === VoiceConnectionDisconnectReason.WebSocketClose &&
-				newState.closeCode === 4014
-			) {
-				console.log('[Voice connection] websocket close with a 4014 code');
-				/**
-				 * If the websocket closed with a 4014 code, this means that we
-				 * should not manually attempt to reconnect but there is a chance
-				 * the connection will recover itself if the reason of disconnect
-				 * was due to switching voice channels. This is also the same code
-				 * for being kicked from the voice channel so we allow 5 s to figure
-				 * out which scenario it is. If the bot has been kicked, we should
-				 * destroy the voice connection
-				 */
+			return acc + b.duration;
+		}, 0);
 
-				entersState(connection, VoiceConnectionStatus.Connecting, 5000).catch(() =>
-					safelyDestroyConnection(connection),
-				);
-			} else if (connection.rejoinAttempts < 5) {
-				// The disconnect is recoverable, and we have < 5 attempts so we
-				// Will reconnect
-				setTimeout(connection.rejoin, (connection.rejoinAttempts + 1) * 5_000);
-			} else {
-				// The disconnect is recoverable, but we have no more attempts
-				safelyDestroyConnection(connection);
-			}
-		});
+		const embed = new EmbedBuilder()
+			.setTitle(song.name || 'Unknown')
+			.setURL(song.url)
+			.setAuthor({ name: '🎧 Added to the queue!' })
+			.addFields([
+				{
+					name: 'Position in queue',
+					value: `#${songIndex}`,
+					inline: true,
+				},
+				{
+					name: 'Estimated time until playing',
+					value: formatDurationInSeconds(totalSongsDuration),
+					inline: true,
+				},
+			]);
 
-		return connection;
-	} catch (error) {
-		safelyDestroyConnection(connection);
+		if (song.thumbnail) {
+			embed.setThumbnail(song.thumbnail);
+		}
 
-		throw error;
-	}
-}
+		queue.textChannel?.send({ embeds: [embed] });
+	});
+	distube.on('addList', (queue, playlist) => {
+		console.log('Add list event');
+
+		const firstPlaylistSong = playlist.songs[0];
+
+		if (!firstPlaylistSong) {
+			return;
+		}
+
+		const songIndex = queue.songs.findIndex((s) => s.id === firstPlaylistSong.id);
+
+		queue.textChannel?.send(
+			`🎶 **Queued \`${playlist.songs.length}\` songs from [${playlist.name}](${
+				playlist.url
+			})** 🎶\n 🕓 **Position in queue: ${songIndex + 1}** \n 🎧 **Requested by: ${playlist.user}**`,
+		);
+	});
+
+	distube.on('playSong', (queue, song) => {
+		const embed = new EmbedBuilder()
+			.setTitle(song.name || 'Unknown')
+			.setURL(song.url)
+			.setAuthor({
+				name: '▶️ Now playing 🎶',
+			})
+			.setImage(config.EMBED_BANNER)
+			.addFields([
+				{
+					name: 'Playback duration',
+					value: song.formattedDuration ?? 'N/A',
+					inline: true,
+				},
+				{
+					name: 'Source',
+					value: song.source ?? 'N/A',
+					inline: true,
+				},
+				{
+					name: 'Views',
+					value: formatViews(song.views),
+					inline: true,
+				},
+			]);
+
+		if (song.thumbnail) {
+			embed.setThumbnail(song.thumbnail);
+		}
+
+		if (song.uploader?.name) {
+			embed.setDescription(`by [${song.uploader.name}](${song.uploader.url})`);
+		}
+
+		queue.textChannel?.send({ embeds: [embed] });
+	});
+};
