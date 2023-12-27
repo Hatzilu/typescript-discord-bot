@@ -22,8 +22,8 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 		return;
 	}
 
-	if (queue.songs.length === 1) {
-		await client.distube?.skip(interaction.guild?.id);
+	if (queue.songs.length <= 1) {
+		await client.distube?.stop(interaction.guild?.id);
 
 		await interaction.reply(`No more songs to skip, the queue has been cleared.`);
 
@@ -32,5 +32,5 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
 	return await client.distube
 		?.skip(interaction.guild?.id)
-		.then(() => interaction.editReply(`Skipping song...`));
+		.then(() => interaction.reply(`Skipping song...`));
 }

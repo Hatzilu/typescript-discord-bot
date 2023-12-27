@@ -30,8 +30,10 @@ const buildQueueEmbed = (songs: Song<unknown>[], page: number) => {
 
 		const user = song.member?.displayName || song.user?.username || 'unknown';
 
+		const nowPlayingTitleOrBlankSpace = i === 0 && page === 0 ? '▶️ Now playing 👇' : `\u200B`;
+
 		embed.addFields({
-			name: `\u200B`,
+			name: nowPlayingTitleOrBlankSpace,
 			value: `\`${index}.\` [${song.name}](${song.url}) |\`${song.formattedDuration} Requested by ${user}\``,
 		});
 	});
