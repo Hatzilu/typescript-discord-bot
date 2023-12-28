@@ -3,7 +3,8 @@ COPY package.json /
 COPY src ./src
 COPY tsconfig.json /
 COPY .env /
-RUN yarn
-RUN yarn deploy:commands
-RUN yarn dev
+RUN npm
+RUN npm deploy:commands
+RUN npm build
+RUN npm start
 EXPOSE 8000
