@@ -4,6 +4,7 @@ COPY src ./src
 COPY tsconfig.json /
 COPY .env /
 RUN npm
+RUN npm install
 RUN npm deploy:commands
 RUN npm build
 RUN npm start
